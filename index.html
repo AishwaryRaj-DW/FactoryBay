@@ -233,6 +233,14 @@
         <span>Stats</span>
       </button>
 
+      <span id="shift-pill" class="hidden px-2.5 py-1.5 rounded text-xs font-semibold bg-amber-500 text-slate-950 tabular-nums">Shift 00:00</span>
+      <button onclick="perfOpenMission()" class="px-2.5 py-1.5 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 transition flex items-center gap-1" title="Choose a mission and start a timed shift">
+        <i class="fa-solid fa-bullseye text-amber-400"></i><span class="hidden md:inline">Mission</span>
+      </button>
+      <button onclick="perfOpenReport()" class="px-2.5 py-1.5 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 transition flex items-center gap-1" title="Operator assessment report">
+        <i class="fa-solid fa-clipboard-check text-amber-400"></i><span class="hidden md:inline">Assessment</span>
+      </button>
+
       <button onclick="resetExperiment()" class="px-2.5 py-1.5 rounded text-xs font-medium bg-orange-950/80 hover:bg-orange-900 text-orange-200 border border-orange-700/50 transition flex items-center gap-1" title="Emergency Stop & SCADA Reset">
         <i class="fa-solid fa-rotate-left"></i>
         <span class="hidden md:inline">Reset</span>
@@ -243,6 +251,43 @@
       </button>
     </div>
   </header>
+
+  <!-- MISSION BRIEFING -->
+  <div id="mission-modal" class="fixed inset-0 z-50 bg-slate-950/90 hidden items-center justify-center p-3 md:p-6 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-4xl w-full p-5 max-h-[92vh] overflow-y-auto flex flex-col gap-4">
+      <div>
+        <h2 class="text-lg font-semibold text-slate-100">Choose a mission</h2>
+        <p class="text-xs text-slate-400 mt-1">This rig trains one skill that many jobs depend on: deciding in a fraction of a second whether to act on an item or leave it alone, and moving your hands to match. Pick the setting closest to your goal. Each mission sets the belt, the hazard rate and the pass mark.</p>
+      </div>
+      <div id="mission-cards" class="grid md:grid-cols-2 gap-3"></div>
+      <div class="flex flex-wrap items-center gap-4 text-xs text-slate-300">
+        <label class="flex items-center gap-2">Operator name <input id="mission-name" type="text" maxlength="32" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-slate-100" /></label>
+        <label class="flex items-center gap-2">Shift length
+          <select id="mission-length" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-slate-100"><option value="3">3 minutes</option><option value="5">5 minutes</option><option value="10">10 minutes</option></select></label>
+      </div>
+      <div class="flex gap-2 justify-end">
+        <button onclick="perfCloseMission()" class="px-3 py-1.5 rounded text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600">Free practice</button>
+        <button onclick="perfStartShiftFromModal()" class="px-3 py-1.5 rounded text-xs font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950">Start timed shift</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ASSESSMENT REPORT -->
+  <div id="report-modal" class="fixed inset-0 z-50 bg-slate-950/90 hidden items-center justify-center p-3 md:p-6 overflow-y-auto">
+    <div class="bg-slate-900 border border-slate-700 rounded-xl max-w-3xl w-full p-5 max-h-[92vh] overflow-y-auto flex flex-col gap-3">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <div><h2 class="text-base font-semibold text-slate-100">Operator assessment</h2><p id="report-banner" class="text-xs text-amber-300"></p></div>
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+          <input id="report-name" type="text" maxlength="32" onchange="perfRenameFromReport(this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-slate-100 w-36" title="Operator name" />
+          <button id="report-drill" onclick="perfRunRecommendedDrill()" class="px-2 py-1 rounded bg-amber-900/50 hover:bg-amber-800/60 text-amber-200 border border-amber-700/50">Run suggested drill</button>
+          <button onclick="perfDownloadReport()" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600">Download report</button>
+          <button onclick="perfDownloadJSON()" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600">JSON</button>
+          <button onclick="perfCloseReport()" class="px-2 py-1 rounded bg-slate-700 hover:bg-slate-600 text-white">Close</button>
+        </div>
+      </div>
+      <div id="report-body" class="rp"></div>
+    </div>
+  </div>
 
   <!-- DETAILED SPEED & 3D ITEM INTERACTION STATS MODAL (Auto-opened via Quest 3 Controller or Button) -->
   <div id="stats-modal" class="fixed inset-0 z-50 scada-panel bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-3 md:p-6 overflow-y-auto">
@@ -554,6 +599,26 @@
   <!-- RIGHT PANEL: INDUSTRIAL SDT METRICS & CRANE TELEMETRY LOG -->
   <aside id="panel-right" class="fixed top-16 right-2 bottom-12 w-80 md:w-96 max-w-[92vw] z-20 flex flex-col gap-2 overflow-y-auto pl-1 transition-transform duration-300">
 
+    <!-- OPERATOR RATING -->
+    <section id="perf-panel" class="scada-panel p-3 flex flex-col gap-2 shrink-0">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-1.5">
+        <h2 class="text-xs font-semibold text-slate-100">Operator rating</h2>
+        <span id="perf-tier" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-600">Not rated</span>
+      </div>
+      <div class="flex items-end gap-3">
+        <div><div id="perf-rating" class="text-4xl font-bold text-slate-100 leading-none">—</div><div class="text-[10px] text-slate-400 mt-1">current rate, last 20 units</div></div>
+        <div class="text-[11px] text-slate-300 pb-1"><div id="perf-trend"></div><div id="perf-session" class="text-slate-400"></div></div>
+      </div>
+      <canvas id="perf-spark" width="260" height="40" class="w-full h-10 rounded bg-slate-900/70"></canvas>
+      <div id="perf-bars" class="flex flex-col gap-1 text-[10px] text-slate-300"></div>
+      <p id="perf-target" class="text-[10px] text-slate-400"></p>
+      <label class="flex items-center gap-1 text-[10px] text-slate-300 cursor-pointer"><input id="perf-adaptive" type="checkbox" onchange="perfSetAdaptive(this.checked)" class="accent-amber-400" /> Adaptive difficulty <span id="perf-level" class="text-slate-500"></span></label>
+      <div class="flex gap-1">
+        <button onclick="perfOpenReport()" class="flex-1 px-2 py-1 rounded text-[11px] font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950">Assessment report</button>
+        <button onclick="perfOpenMission()" class="px-2 py-1 rounded text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600">Mission</button>
+      </div>
+    </section>
+
     <!-- Coach AI FLOOR SUPERVISOR (permanently docked, top-right) -->
     <section id="ai-coach-dock" class="scada-panel rounded-lg p-3 flex flex-col gap-2 border-r-2 border-r-slate-500 shrink-0">
       <div class="flex items-center justify-between border-b border-slate-700/70 pb-1.5">
@@ -572,6 +637,8 @@
       </div>
       <div class="flex flex-wrap gap-1">
         <button onclick="askAi('How am I doing?')" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600">How am I doing?</button>
+        <button onclick="askAi('What is my rating?')" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600">My rating</button>
+        <button onclick="perfOpenReport()" class="px-1.5 py-0.5 rounded text-[10px] bg-amber-900/50 hover:bg-amber-800/60 text-amber-200 border border-amber-700/50">Assessment</button>
         <button onclick="askAi('Tips for orange cargo')" class="px-1.5 py-0.5 rounded text-[10px] bg-orange-950/60 hover:bg-orange-900/60 text-orange-200 border border-orange-700/50">Orange tips</button>
         <button onclick="askAi('Tips for blue cargo')" class="px-1.5 py-0.5 rounded text-[10px] bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 border border-blue-700/50">Blue tips</button>
         <button onclick="askAi('What about hazards?')" class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-200 border border-emerald-700/50">Hazards</button>
@@ -2544,6 +2611,7 @@
       };
       state.trialsLog.unshift(logEntry);
 
+      perfRecord(block, outcome, nowHit, detailNote);
       updateSDTDashboard();
       updateFittsCalculatorUI();
       renderTelemetryTable();
@@ -3101,6 +3169,7 @@
       });
       aiReset();
       botForget();
+      perfReset();
 
       updateSDTDashboard();
       updateFittsCalculatorUI();
@@ -3692,7 +3761,8 @@
         info: 'border-slate-600 text-slate-300',
         tutorial: 'border-amber-400/70 text-amber-200 bg-amber-950/30',
         user: 'border-blue-500/60 text-blue-200 ml-3',
-        ok: 'border-emerald-500/60 text-emerald-300'
+        ok: 'border-emerald-500/60 text-emerald-300',
+        warn: 'border-orange-500/70 text-orange-200'
       };
       const el = document.createElement('div');
       el.className = 'border-l-2 pl-2 py-0.5 leading-snug ' + (styles[type] || styles.info);
@@ -3729,7 +3799,9 @@
 
     function aiLocalAnswer(q) {
       const s = q.toLowerCase();
-      if (/(how am i|progress|score|stat|accuracy|doing|performance)/.test(s)) return aiStatSummary() + ' Open Stats for the speed and equipment breakdown.';
+      if (/(assess|report)/.test(s)) { perfOpenReport(); return 'Opening your assessment report.'; }
+      if (/(rating|grade|how good)/.test(s)) return perfCoachSummary();
+      if (/(how am i|progress|score|stat|accuracy|doing|performance)/.test(s)) return aiStatSummary() + perfRatingLine() + ' Open Stats for the speed and equipment breakdown.';
       if (/(hazard|green|skip|biohazard|radiation|gas)/.test(s)) return 'Green cargo (biohazard drum, radiation isotope, gas cylinder) is never grabbed. Keep both winches off it and let it reach the end of the belt: that scores a correct rejection.';
       if (/(red|orange|wrench|hammer|gear|cog|toolbox|tool)/.test(s)) return 'Orange cargo (pipe wrench, gear, sledgehammer) goes to the LEFT winch. Move it into the crate\u2019s lane early, then let the crate arrive inside the depth zone (Z \u22121.8 to +0.8 m).';
       if (/(blue|battery|microchip|dynamo|power)/.test(s)) return 'Blue cargo (battery, microchip, dynamo rotor) goes to the RIGHT winch. Pre-position it before the crate enters the hit volume instead of chasing it.';
@@ -4203,6 +4275,625 @@
     }
 
     /*************************************************************************
+     * 13c. OPERATOR RATING, ASSESSMENT REPORT, MISSIONS & ADAPTIVE DIFFICULTY
+     * Purpose: turn the rig into a training tool. It rates the person on the
+     * skills that transfer to real work, shows it live, coaches against it,
+     * and produces a report they can keep and compare across sessions.
+     *************************************************************************/
+    const PERF_WINDOW = 20;
+    const PERF_TIERS = [[0, 'Trainee'], [45, 'Apprentice'], [60, 'Operator'], [75, 'Senior operator'], [88, 'Master operator']];
+    const PERF_TIER_COLOURS = ['#94a3b8', '#7dd3fc', '#4ade80', '#fde68a', '#fbbf24'];
+    const PERF_COMP = [
+      ['acc', 'Accuracy', 'Share of decisions that were correct', 'Fewer mis-sorts and less rework'],
+      ['disc', 'Discrimination', 'How well you separate targets from hazards (d\u2032)', 'Spotting the one bad item in a stream'],
+      ['safety', 'Safety', 'Keeping clear of hazard cargo and using the right winch', 'Preventing incidents and injuries'],
+      ['antic', 'Anticipation', 'Catching cargo early in the hit zone', 'Time margin before a problem becomes an accident'],
+      ['cons', 'Consistency', 'Steadiness from one stretch of work to the next', 'Reliable output across a whole shift']
+    ];
+    const PERF_ADVICE = {
+      acc: 'Slow the belt a little and aim for clean sorts before adding speed.',
+      disc: 'Run a hazard drill and name the colour before you move. Orange and blue go to a winch; green never does.',
+      safety: 'When unsure, do nothing. Skipping a hazard scores a correct rejection; grabbing one costs far more.',
+      antic: 'Park the winch in the crate\u2019s lane before it enters the zone instead of chasing it.',
+      cons: 'Your accuracy varies a lot between stretches. Keep a steady rhythm and take a short break if you are tiring.'
+    };
+    const SCENARIOS = {
+      port: {
+        id: 'port', name: 'Port cargo sorting', sign: ['NORTHPORT LOGISTICS TERMINAL', 'SORTING BAY 04'],
+        goal: 'Route general freight and electrical cargo to the right handling line while keeping hazardous drums out of it.',
+        real: ['Dockside crane and forklift operation', 'Warehouse and distribution sorting', 'Any job with a fast stream of items where a few must be left alone'],
+        targets: { rating: 75, acc: 90, haz: 0 }, cfg: { smin: 18, smax: 32, interval: 850, pr: 35, pb: 35, pg: 30 }
+      },
+      hazmat: {
+        id: 'hazmat', name: 'Hazmat-safe handling', sign: ['CHEMCORE PLANT', 'HAZMAT LINE 2'],
+        goal: 'Stay vigilant when dangerous items are rare. Most cargo is safe, which is exactly when attention slips.',
+        real: ['Chemical and nuclear plant material handling', 'Security and safety screening', 'Long-watch monitoring where misses are costly'],
+        targets: { rating: 80, acc: 92, haz: 0 }, cfg: { smin: 14, smax: 24, interval: 1100, pr: 45, pb: 45, pg: 10 }
+      },
+      hub: {
+        id: 'hub', name: 'Peak-season parcel hub', sign: ['METRO PARCEL HUB', 'PEAK SHIFT \u00B7 LINE 7'],
+        goal: 'Keep accuracy while the belt runs fast. Builds speed without letting errors creep in.',
+        real: ['Courier and e-commerce fulfilment lines', 'Baggage handling', 'Food and packaging inspection lines'],
+        targets: { rating: 70, acc: 85, haz: 1 }, cfg: { smin: 24, smax: 40, interval: 600, pr: 40, pb: 40, pg: 20 }
+      },
+      rehab: {
+        id: 'rehab', name: 'Hand\u2013eye rehabilitation', sign: ['NEURO-MOTOR REHAB LAB', 'STATION 3'],
+        goal: 'Slow, forgiving practice that rebuilds reach, timing and hand\u2013eye coordination, with the difficulty rising as you improve.',
+        real: ['Upper-limb and neuro rehabilitation exercises', 'Motor learning for new equipment operators', 'Reaction-time and coordination training'],
+        targets: { rating: 60, acc: 80, haz: 2 }, cfg: { smin: 12, smax: 20, interval: 1400, pr: 45, pb: 45, pg: 10 }
+      }
+    };
+    const perf = {
+      all: [], history: [], tier: null, level: 0, adaptive: false,
+      lastCoach: 0, lastCheckin: 0, lastVigilance: 0, uiClock: 0,
+      scenarioId: 'port', scenario: SCENARIOS.port, operator: 'Operator 01',
+      base: { smin: 18, smax: 32, interval: 850 },
+      shift: { active: false, durationMs: 0, startAt: 0 }
+    };
+    const perfEsc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const perfTier = r => { let t = 0; PERF_TIERS.forEach((x, i) => { if (r >= x[0]) t = i; }); return t; };
+
+    function perfRate(E) {
+      const n = E.length;
+      if (!n) return null;
+      let h = 0, m = 0, cr = 0, fa = 0, haz = 0, wrong = 0, hazTrials = 0, paceSum = 0, paceN = 0;
+      E.forEach(e => {
+        if (e.out === 'HIT') { h++; if (e.pace !== null) { paceSum += e.pace; paceN++; } }
+        else if (e.out === 'MISS') m++;
+        else if (e.out === 'CORRECT REJECTION') { cr++; hazTrials++; }
+        else if (e.out === 'FALSE ALARM') {
+          fa++;
+          if (e.note === 'Seized Hazard') { haz++; hazTrials++; } else if (e.note === 'Wrong Winch') wrong++;
+        }
+      });
+      const go = h + m, nogo = cr + fa;
+      const acc = (h + cr) / n;
+      const zH = normSinV(botClamp((h + 0.5) / (go + 1), 0.001, 0.999));
+      const zF = normSinV(botClamp((fa + 0.5) / (nogo + 1), 0.001, 0.999));
+      const dp = zH - zF, c = -0.5 * (zH + zF);
+      const disc = botClamp(dp / 3.5, 0, 1);
+      const safety = hazTrials > 0
+        ? botClamp(1 - (haz + wrong * 0.4) / Math.max(hazTrials, 3) * 1.6, 0, 1)
+        : botClamp(1 - wrong * 0.15, 0, 1);
+      const antic = paceN ? paceSum / paceN : 0.7;
+      let cons = 0.8;
+      if (n >= 12) {
+        const k = 4, sz = Math.floor(n / k), accs = [];
+        for (let i = 0; i < k; i++) {
+          const ch = E.slice(i * sz, (i + 1) * sz);
+          accs.push(ch.filter(x => x.out === 'HIT' || x.out === 'CORRECT REJECTION').length / ch.length);
+        }
+        cons = botClamp(1 - botSd(accs) / 0.3, 0, 1);
+      }
+      const rating = 100 * (0.35 * acc + 0.20 * disc + 0.20 * safety + 0.15 * antic + 0.10 * cons);
+      return { rating, acc, disc, safety, antic, cons, dp, c, h, m, cr, fa, haz, wrong, n, go, nogo,
+        hitRate: go ? h / go : 0, faRate: nogo ? fa / nogo : 0 };
+    }
+
+    // ---- Recording ---------------------------------------------------------
+    function perfRecord(block, outcome, nowHit, note) {
+      let pace = null;
+      if (outcome === 'HIT') {
+        const span = Math.max(0.1, state.hitZoneNearZ - state.hitZoneFarZ);
+        pace = botClamp(1 - (block.mesh.position.z - state.hitZoneFarZ) / span, 0, 1);
+      }
+      perf.all.push({ out: outcome, type: block.type, pace, note, t: nowHit });
+      if (perf.all.length > 3000) perf.all.shift();
+      const cur = perfRate(perf.all.slice(-PERF_WINDOW));
+      perf.history.push(cur.rating);
+      if (perf.history.length > 600) perf.history.shift();
+      perfAfterTrial(cur);
+      perfUpdateUI(true);
+    }
+    function perfCoach(text, type, vr, force) {
+      const now = performance.now();
+      if (!force && now - perf.lastCoach < 12000) return;
+      perf.lastCoach = now;
+      aiSay(text, type || 'info', vr || null);
+    }
+    function perfFocus(r) {
+      let low = null;
+      PERF_COMP.forEach(c => { if (!low || r[c[0]] < r[low[0]]) low = c; });
+      return low;
+    }
+    function perfAfterTrial(cur) {
+      const total = perf.all.length;
+      if (total >= 10) {
+        const tier = perfTier(cur.rating);
+        if (perf.tier !== null && tier > perf.tier) {
+          perfCoach(`Your current rate moved up to ${PERF_TIERS[tier][1]} (${cur.rating.toFixed(0)}). Keep that rhythm.`, 'ok',
+            { title: 'RATING UP', text: `${PERF_TIERS[tier][1]}, ${cur.rating.toFixed(0)}` }, true);
+        } else if (perf.tier !== null && tier < perf.tier && total >= 20) {
+          perfCoach(`Your current rate slipped to ${PERF_TIERS[tier][1]} (${cur.rating.toFixed(0)}). ${PERF_ADVICE[perfFocus(cur)[0]]}`, 'warn',
+            { title: 'RATING DOWN', text: PERF_ADVICE[perfFocus(cur)[0]] });
+        }
+        perf.tier = tier;
+      }
+      if (total >= 20 && total - perf.lastCheckin >= 20) {
+        perf.lastCheckin = total;
+        const f = perfFocus(cur);
+        perfCoach(`Check-in at ${total} units: current rating ${cur.rating.toFixed(0)}, weakest area ${f[1].toLowerCase()} (${(cur[f[0]] * 100).toFixed(0)}%). ${PERF_ADVICE[f[0]]}`, 'info',
+          { title: 'CHECK-IN', text: `Rating ${cur.rating.toFixed(0)}. Focus: ${f[1].toLowerCase()}.` });
+      }
+      if (total >= 40 && total - perf.lastVigilance >= 20) {
+        const prev = perfRate(perf.all.slice(-2 * PERF_WINDOW, -PERF_WINDOW));
+        if (prev && prev.rating - cur.rating >= 12) {
+          perf.lastVigilance = total;
+          perfCoach(`Your rating fell ${(prev.rating - cur.rating).toFixed(0)} points over the last ${PERF_WINDOW} units. That pattern usually means attention is fading. Take a short break or slow the belt.`, 'warn',
+            { title: 'ATTENTION DIP', text: 'Rating dropped. Short break or slow the belt.' }, true);
+        }
+      }
+      if (perf.adaptive && total % 10 === 0) perfAdapt(cur);
+    }
+
+    // ---- Adaptive difficulty -------------------------------------------------
+    function perfApplyLevel() {
+      const b = perf.base, L = perf.level, set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v; };
+      set('slider-speed-min', botClamp(b.smin + 2 * L, 12, 35));
+      set('slider-speed-max', botClamp(b.smax + 2 * L, 20, 50));
+      set('slider-interval', botClamp(b.interval - 50 * L, 350, 2500));
+      updateSpawnParams();
+      const lv = document.getElementById('perf-level');
+      if (lv) lv.textContent = L ? `(level ${L > 0 ? '+' : ''}${L})` : '';
+    }
+    function perfAdapt(cur) {
+      if (state.trainingActive) return;
+      const before = perf.level;
+      if (cur.acc >= 0.9 && cur.rating >= 75 && perf.level < 8) perf.level++;
+      else if (cur.acc <= 0.65 && perf.level > -3) perf.level--;
+      if (perf.level === before) return;
+      perfApplyLevel();
+      const up = perf.level > before;
+      perfCoach(up ? 'You are handling this well, so I sped the belt up a notch.' : 'That was a lot at once. I eased the belt so you can rebuild accuracy.', up ? 'ok' : 'info',
+        { title: up ? 'HARDER' : 'EASIER', text: `Difficulty level ${perf.level}` }, true);
+    }
+    function perfSetAdaptive(on) { perf.adaptive = !!on; if (!on && perf.level !== 0) { perf.level = 0; perfApplyLevel(); } }
+
+    // ---- Missions and shifts ---------------------------------------------------
+    function perfApplyScenario(id) {
+      const sc = SCENARIOS[id] || SCENARIOS.port;
+      perf.scenarioId = sc.id; perf.scenario = sc; perf.level = 0;
+      perf.base = { smin: sc.cfg.smin, smax: sc.cfg.smax, interval: sc.cfg.interval };
+      if (!state.trainingActive) {
+        const set = (i, v) => { const el = document.getElementById(i); if (el) el.value = v; };
+        set('slider-prob-r', sc.cfg.pr); set('slider-prob-b', sc.cfg.pb); set('slider-prob-g', sc.cfg.pg);
+        perfApplyLevel();
+        updateProbabilities();
+      }
+      world.dirty = true;
+      perfUpdateUI(true);
+    }
+    function perfRenderMission() {
+      const box = document.getElementById('mission-cards');
+      if (!box) return;
+      box.innerHTML = Object.values(SCENARIOS).map(sc => {
+        const on = sc.id === perf.scenarioId;
+        return `<button onclick="perfPickMission('${sc.id}')" class="text-left rounded-lg p-3 border ${on ? 'border-amber-500 bg-slate-800' : 'border-slate-700 bg-slate-900 hover:bg-slate-800'} flex flex-col gap-1.5">
+          <span class="text-sm font-semibold text-slate-100">${sc.name}</span>
+          <span class="text-[11px] text-slate-300">${sc.goal}</span>
+          <span class="text-[10px] text-slate-400">Real-world use: ${sc.real.join('; ')}.</span>
+          <span class="text-[10px] text-amber-300">Pass: rating \u2265 ${sc.targets.rating}, accuracy \u2265 ${sc.targets.acc}%, hazard grabs \u2264 ${sc.targets.haz}</span></button>`;
+      }).join('');
+    }
+    function perfPickMission(id) { perfApplyScenario(id); perfRenderMission(); }
+    function perfOpenMission() {
+      perfRenderMission();
+      document.getElementById('mission-name').value = perf.operator;
+      const m = document.getElementById('mission-modal'); m.classList.remove('hidden'); m.classList.add('flex');
+    }
+    function perfCloseMission() {
+      const nm = document.getElementById('mission-name').value.trim();
+      if (nm) perf.operator = nm.slice(0, 32);
+      const m = document.getElementById('mission-modal'); m.classList.add('hidden'); m.classList.remove('flex');
+      try { localStorage.setItem('cst_mission_seen', '1'); } catch (e) {}
+      world.dirty = true;
+    }
+    function perfStartShiftFromModal() {
+      const mins = parseInt(document.getElementById('mission-length').value, 10) || 3;
+      perfCloseMission();
+      if (state.trainingActive) stopTrainingProgram();
+      resetExperiment();
+      perfApplyScenario(perf.scenarioId);
+      perf.shift = { active: true, durationMs: mins * 60000, startAt: performance.now() };
+      if (!state.streamActive) toggleStream();
+      const pill = document.getElementById('shift-pill'); if (pill) pill.classList.remove('hidden');
+      perfCoach(`Shift started: ${perf.scenario.name}, ${mins} minutes. Target rating ${perf.scenario.targets.rating}. Good luck, ${perf.operator}.`, 'ok',
+        { title: 'SHIFT STARTED', text: `${mins} min. Target ${perf.scenario.targets.rating}.` }, true);
+    }
+    function perfEndShift() {
+      if (!perf.shift.active) return;
+      perf.shift.active = false;
+      const pill = document.getElementById('shift-pill'); if (pill) pill.classList.add('hidden');
+      if (state.streamActive) toggleStream();
+      perfSaveSession();
+      perfOpenReport('Shift complete');
+    }
+    function perfTick(now) {
+      if (perf.shift.active) {
+        const left = perf.shift.durationMs - (now - perf.shift.startAt);
+        const pill = document.getElementById('shift-pill');
+        if (pill) pill.textContent = `Shift ${perfClock(Math.max(0, left))}`;
+        if (left <= 0) perfEndShift();
+      }
+      perfUpdateUI(false);
+      perfWorldUpdate(now);
+    }
+    const perfClock = ms => { const s = Math.max(0, Math.round(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, '0') + ':' + String(s % 60).padStart(2, '0'); };
+    function perfReset() {
+      const hadLevel = perf.level !== 0;
+      perf.all = []; perf.history = []; perf.tier = null; perf.lastCheckin = 0; perf.lastVigilance = 0; perf.level = 0;
+      perf.shift.active = false;
+      const pill = document.getElementById('shift-pill'); if (pill) pill.classList.add('hidden');
+      if (hadLevel) perfApplyLevel();
+      perfUpdateUI(true);
+    }
+
+    // ---- Live card -----------------------------------------------------------------
+    function perfUpdateUI(force) {
+      const now = performance.now();
+      if (!force && now - perf.uiClock < 400) return;
+      perf.uiClock = now;
+      const $ = id => document.getElementById(id);
+      if (!$('perf-rating')) return;
+      const cur = perfRate(perf.all.slice(-PERF_WINDOW)), ses = perfRate(perf.all);
+      const t = perf.scenario.targets;
+      $('perf-target').textContent = `${perf.scenario.name}. Pass: rating \u2265 ${t.rating}, accuracy \u2265 ${t.acc}%, hazard grabs \u2264 ${t.haz}.`;
+      if (!cur) {
+        $('perf-rating').textContent = '\u2014'; $('perf-tier').textContent = 'Not rated';
+        $('perf-trend').textContent = ''; $('perf-session').textContent = 'Sort a few units to get rated.';
+        $('perf-bars').innerHTML = '';
+        perfSpark();
+        return;
+      }
+      const ti = perfTier(cur.rating);
+      $('perf-rating').textContent = cur.rating.toFixed(0);
+      $('perf-rating').style.color = PERF_TIER_COLOURS[ti];
+      $('perf-tier').textContent = PERF_TIERS[ti][1];
+      let trend = '';
+      if (perf.all.length >= 30) {
+        const prev = perfRate(perf.all.slice(-2 * PERF_WINDOW, -PERF_WINDOW));
+        if (prev) { const d = cur.rating - prev.rating; trend = Math.abs(d) < 1 ? 'steady' : (d > 0 ? `\u25B2 +${d.toFixed(0)}` : `\u25BC ${d.toFixed(0)}`); }
+      }
+      $('perf-trend').textContent = trend;
+      const perMin = perf.all.filter(e => now - e.t < 60000).length;
+      $('perf-session').textContent = `Session ${ses.rating.toFixed(0)} \u00B7 ${perMin} units/min`;
+      $('perf-bars').innerHTML = PERF_COMP.map(c => {
+        const v = cur[c[0]] * 100;
+        return `<div><div class="flex justify-between"><span>${c[1]}</span><span>${v.toFixed(0)}%</span></div><div class="w-full h-1 bg-slate-900 rounded overflow-hidden"><div class="h-full ${v >= 80 ? 'bg-emerald-500' : v >= 60 ? 'bg-amber-500' : 'bg-orange-600'}" style="width:${v}%"></div></div></div>`;
+      }).join('');
+      perfSpark();
+    }
+    function perfSpark() {
+      const cv = document.getElementById('perf-spark');
+      if (!cv) return;
+      const g = cv.getContext('2d'), W = cv.width, H = cv.height;
+      g.clearRect(0, 0, W, H);
+      const h = perf.history.slice(-60);
+      g.strokeStyle = 'rgba(148,163,184,.25)'; g.lineWidth = 1;
+      const ty = H - (perf.scenario.targets.rating / 100) * H;
+      g.setLineDash([3, 3]); g.beginPath(); g.moveTo(0, ty); g.lineTo(W, ty); g.stroke(); g.setLineDash([]);
+      if (h.length < 2) return;
+      g.strokeStyle = '#fbbf24'; g.lineWidth = 2; g.beginPath();
+      h.forEach((v, i) => { const x = i / (h.length - 1) * (W - 4) + 2, y = H - 3 - v / 100 * (H - 6); i ? g.lineTo(x, y) : g.moveTo(x, y); });
+      g.stroke();
+    }
+
+    // ---- Assessment report ---------------------------------------------------------------
+    function perfLoadSessions() { try { return JSON.parse(localStorage.getItem('cst_sessions') || '[]'); } catch (e) { return []; } }
+    function perfSaveSession() {
+      const ses = perfRate(perf.all);
+      if (!ses || perf.all.length < 10) return false;
+      const list = perfLoadSessions();
+      list.push({ t: Date.now(), name: perf.operator, scenario: perf.scenarioId, rating: +ses.rating.toFixed(1), acc: +(ses.acc * 100).toFixed(1), dp: +ses.dp.toFixed(2), haz: ses.haz, trials: ses.n });
+      try { localStorage.setItem('cst_sessions', JSON.stringify(list.slice(-30))); return true; } catch (e) { return false; }
+    }
+    function perfAssessment() {
+      const ses = perfRate(perf.all);
+      if (!ses) return null;
+      const cur = perfRate(perf.all.slice(-PERF_WINDOW));
+      const sc = perf.scenario, t = sc.targets, need = [];
+      if (ses.n < 30) need.push(`Complete at least 30 units (you have ${ses.n}).`);
+      if (ses.rating < t.rating) need.push(`Raise your session rating to ${t.rating} (now ${ses.rating.toFixed(0)}).`);
+      if (ses.acc * 100 < t.acc) need.push(`Reach ${t.acc}% accuracy (now ${(ses.acc * 100).toFixed(0)}%).`);
+      if (ses.haz > t.haz) need.push(`Keep hazard grabs to ${t.haz} or fewer (now ${ses.haz}).`);
+      const byType = ty => { const a = perf.all.filter(e => e.type === ty && (e.out === 'HIT' || e.out === 'MISS')); return a.length >= 5 ? a.filter(e => e.out === 'MISS').length / a.length : null; };
+      const mr = byType('red'), mb = byType('blue');
+      let drill = null, drillWhy = '';
+      if (ses.haz >= 2) { drill = 'green'; drillWhy = 'hazard skipping'; }
+      else if (mr !== null && mb !== null && Math.abs(mr - mb) >= 0.2) { drill = mr > mb ? 'red' : 'blue'; drillWhy = `${drill === 'red' ? 'orange' : 'blue'} cargo, which you miss more often`; }
+      const comps = PERF_COMP.slice().sort((a, b) => ses[b[0]] - ses[a[0]]);
+      return { ses, cur, sc, need, pass: need.length === 0, strengths: comps.filter(c => ses[c[0]] >= 0.8).slice(0, 2),
+        focus: comps.slice().reverse().filter(c => ses[c[0]] < 0.8).slice(0, 2), drill, drillWhy };
+    }
+    function perfReportHTML() {
+      const A = perfAssessment();
+      if (!A) return '<p class="rp-mut">No units sorted yet. Start a shift or practise for a minute, then open the report again.</p>';
+      const { ses, cur, sc } = A, ti = perfTier(ses.rating);
+      const t0 = perf.all[0].t, t1 = perf.all[perf.all.length - 1].t, mins = Math.max(0.1, (t1 - t0) / 60000);
+      const bias = ses.c < -0.3 ? 'You lean toward acting quickly, which risks grabbing things you should skip.'
+        : ses.c > 0.3 ? 'You lean toward waiting, which means some valid crates are missed.' : 'Your grab-or-wait balance is well judged.';
+      const prev = perfLoadSessions().filter(s => s.name.toLowerCase() === perf.operator.toLowerCase() && s.scenario === perf.scenarioId).slice(-1)[0];
+      const delta = prev ? ses.rating - prev.rating : null;
+      // learning curve
+      const pts = perf.history.filter((_, i) => (i + 1) % 10 === 0);
+      let curve = '<p class="rp-mut">The learning curve appears after 20 units.</p>';
+      if (pts.length >= 2) {
+        const W = 520, H = 90;
+        const line = pts.map((v, i) => `${(i / (pts.length - 1) * (W - 20) + 10).toFixed(1)},${(H - 8 - v / 100 * (H - 16)).toFixed(1)}`).join(' ');
+        curve = `<svg viewBox="0 0 ${W} ${H}" class="rp-svg"><line x1="10" x2="${W - 10}" y1="${H - 8 - sc.targets.rating / 100 * (H - 16)}" y2="${H - 8 - sc.targets.rating / 100 * (H - 16)}" stroke="#94a3b8" stroke-dasharray="4 4" opacity=".5"/><polyline fill="none" stroke="#d97706" stroke-width="2.5" points="${line}"/></svg><p class="rp-mut">Rating every 10 units. Dashed line is the pass mark (${sc.targets.rating}).</p>`;
+      }
+      // vigilance by minute
+      const buckets = {};
+      perf.all.forEach(e => { const k = Math.floor((e.t - t0) / 60000); (buckets[k] = buckets[k] || []).push(e); });
+      const keys = Object.keys(buckets).map(Number).sort((a, b) => a - b).slice(0, 12);
+      const accs = keys.map(k => buckets[k].filter(e => e.out === 'HIT' || e.out === 'CORRECT REJECTION').length / buckets[k].length);
+      let vig = '<p class="rp-mut">Vigilance shows once you have played more than a minute.</p>';
+      if (keys.length >= 2) {
+        const third = Math.max(1, Math.floor(accs.length / 3));
+        const drop = botMean(accs.slice(0, third)) - botMean(accs.slice(-third));
+        vig = `<div class="rp-cols">${accs.map((a, i) => `<div class="rp-col"><i style="height:${(a * 100).toFixed(0)}%"></i><span>${i + 1}</span></div>`).join('')}</div>` +
+          `<p class="rp-mut">Accuracy per minute. ${drop > 0.1 ? 'It fell ' + (drop * 100).toFixed(0) + ' points from the start to the end, a vigilance decrement. Plan breaks for long shifts.' : 'It held steady across the session.'}</p>`;
+      }
+      const weak = Object.entries(state.interactionStats.byIcon).filter(([, s]) => s.total >= 2)
+        .map(([n, s]) => ({ n, a: (s.hits + s.cr) / s.total, c: s.total })).sort((x, y) => x.a - y.a).slice(0, 3);
+      const model = botGetModel();
+      const ip = state.calcB !== null && Math.abs(state.calcB) > 1 ? (1000 / Math.abs(state.calcB)).toFixed(2) + ' bits/s' : null;
+      const bars = PERF_COMP.map(c => {
+        const v = ses[c[0]] * 100;
+        return `<div class="rp-row"><div><b>${c[1]}</b><span class="rp-mut"> ${c[2]}. In real work: ${c[3].toLowerCase()}.</span></div><div class="rp-barwrap"><div class="rp-bar"><i style="width:${v.toFixed(0)}%"></i></div><b>${v.toFixed(0)}</b></div></div>`;
+      }).join('');
+      return `
+      <div class="rp-head"><div><div class="rp-mut">${perfEsc(perf.operator)} \u00B7 ${sc.name} \u00B7 ${new Date().toLocaleDateString()}</div>
+        <div class="rp-big" style="color:${PERF_TIER_COLOURS[ti]}">${ses.rating.toFixed(0)}<small> / 100</small></div>
+        <div><b>${PERF_TIERS[ti][1]}</b>${delta !== null ? ` \u00B7 ${delta >= 0 ? '+' : ''}${delta.toFixed(1)} vs your last session` : ''}</div></div>
+        <div class="rp-badge ${A.pass ? 'ok' : 'no'}">${A.pass ? 'Mission passed' : 'Not yet passed'}</div></div>
+      <div class="rp-grid">
+        <div><b>${ses.n}</b><span class="rp-mut">units in ${mins.toFixed(1)} min</span></div>
+        <div><b>${(ses.acc * 100).toFixed(0)}%</b><span class="rp-mut">accuracy</span></div>
+        <div><b>${ses.dp.toFixed(2)}</b><span class="rp-mut">d\u2032 discrimination</span></div>
+        <div><b>${ses.haz}</b><span class="rp-mut">hazard grabs</span></div>
+        <div><b>${cur.rating.toFixed(0)}</b><span class="rp-mut">current rate (last ${PERF_WINDOW})</span></div>
+      </div>
+      ${A.pass ? '' : `<h3>To pass this mission</h3><ul>${A.need.map(n => `<li>${n}</li>`).join('')}</ul>`}
+      <h3>Skill breakdown</h3>${bars}
+      <h3>Decision style</h3>
+      <p>Hit rate ${(ses.hitRate * 100).toFixed(0)}%, false-alarm rate ${(ses.faRate * 100).toFixed(0)}%, criterion c = ${ses.c.toFixed(2)}. ${bias}</p>
+      <h3>Movement</h3>
+      <p>Anticipation ${(ses.antic * 100).toFixed(0)}%.${ip ? ' Fitts throughput ' + ip + '.' : ''}${model ? ` You start moving ${model.onset ? model.onset.toFixed(2) + ' s' : 'late'} before a crate arrives, settle ${model.settle ? model.settle.toFixed(2) + ' s' : 'at arrival'} before it, with ${(model.eff * 100).toFixed(0)}% path efficiency.` : ' Finish the movement trainer period to add path timing here.'}</p>
+      <h3>Learning curve</h3>${curve}
+      <h3>Vigilance</h3>${vig}
+      <h3>Strengths and focus</h3>
+      <ul>${A.strengths.map(c => `<li><b>Strong: ${c[1]}.</b> ${c[3]}.</li>`).join('') || '<li>No skill is above 80% yet. That is normal early on.</li>'}
+      ${A.focus.map(c => `<li><b>Work on ${c[1].toLowerCase()} (${(ses[c[0]] * 100).toFixed(0)}%).</b> ${PERF_ADVICE[c[0]]}</li>`).join('')}</ul>
+      ${weak.length ? `<h3>Items to practise</h3><ul>${weak.map(w => `<li>${w.n}: ${(w.a * 100).toFixed(0)}% over ${w.c} units</li>`).join('')}</ul>` : ''}
+      <h3>Next step</h3>
+      <p>${A.drill ? `Run a 5-unit drill on ${A.drillWhy}. ` : ''}${A.pass ? 'Try a harder mission, or switch on adaptive difficulty.' : 'Repeat the shift after the focus work above.'}</p>
+      <h3>Why this matters in real work</h3>
+      <p>${sc.goal}</p><ul>${sc.real.map(r => `<li>${r}</li>`).join('')}</ul>
+      <p class="rp-mut">Rating = 35% accuracy, 20% discrimination, 20% safety, 15% anticipation, 10% consistency. This is a training measure, not a licence.</p>`;
+    }
+    const REPORT_CSS = `.rp{font-family:Inter,system-ui,sans-serif;color:var(--rp-fg,#e2e8f0);line-height:1.5;font-size:13px}
+      .rp h3{font-size:12px;text-transform:none;letter-spacing:0;margin:16px 0 6px;color:var(--rp-fg,#e2e8f0);border-bottom:1px solid var(--rp-line,#243044);padding-bottom:3px}
+      .rp ul{margin:4px 0 4px 18px;padding:0}.rp li{margin:2px 0}.rp p{margin:4px 0}
+      .rp-mut{color:var(--rp-mut,#94a3b8);font-size:11.5px}
+      .rp-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+      .rp-big{font-size:48px;font-weight:700;line-height:1.1}.rp-big small{font-size:16px;color:var(--rp-mut,#94a3b8);font-weight:500}
+      .rp-badge{padding:6px 12px;border-radius:6px;font-weight:600;border:1px solid}
+      .rp-badge.ok{color:#4ade80;border-color:#16a34a}.rp-badge.no{color:#fbbf24;border-color:#b45309}
+      .rp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+      .rp-grid div{background:var(--rp-card,#111a2c);border:1px solid var(--rp-line,#243044);border-radius:6px;padding:8px;display:flex;flex-direction:column}
+      .rp-grid b{font-size:18px}
+      .rp-row{display:grid;grid-template-columns:1fr 150px;gap:10px;align-items:center;margin:6px 0}
+      .rp-barwrap{display:flex;align-items:center;gap:6px}.rp-bar{flex:1;height:7px;background:var(--rp-bar,#1e293b);border-radius:4px;overflow:hidden}
+      .rp-bar i{display:block;height:100%;background:#d97706}
+      .rp-svg{width:100%;max-width:520px;background:var(--rp-card,#111a2c);border:1px solid var(--rp-line,#243044);border-radius:6px}
+      .rp-cols{display:flex;gap:6px;align-items:flex-end;height:80px;max-width:520px}
+      .rp-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;font-size:10px;color:var(--rp-mut,#94a3b8)}
+      .rp-col i{width:100%;background:#d97706;border-radius:3px 3px 0 0;display:block}
+      @media(max-width:640px){.rp-grid{grid-template-columns:repeat(2,1fr)}.rp-row{grid-template-columns:1fr}}`;
+    (function () { const st = document.createElement('style'); st.textContent = ':root{--rp-fg:#e2e8f0}' + REPORT_CSS; document.head.appendChild(st); })();
+
+    function perfOpenReport(banner) {
+      const m = document.getElementById('report-modal');
+      document.getElementById('report-name').value = perf.operator;
+      document.getElementById('report-banner').textContent = banner || '';
+      document.getElementById('report-body').innerHTML = perfReportHTML();
+      const A = perfAssessment();
+      document.getElementById('report-drill').style.display = A && A.drill ? '' : 'none';
+      m.classList.remove('hidden'); m.classList.add('flex');
+    }
+    function perfCloseReport() { const m = document.getElementById('report-modal'); m.classList.add('hidden'); m.classList.remove('flex'); }
+    function perfRenameFromReport(v) { perf.operator = (v || '').slice(0, 32) || 'Operator 01'; document.getElementById('report-body').innerHTML = perfReportHTML(); world.dirty = true; }
+    function perfDownload(name, mime, text) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([text], { type: mime }));
+      a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    }
+    function perfDownloadReport() {
+      const css = '<style>:root{--rp-bg:#0b1220;--rp-fg:#e2e8f0;--rp-mut:#94a3b8;--rp-line:#243044;--rp-card:#111a2c;--rp-bar:#1e293b}body{background:var(--rp-bg);margin:0;padding:24px}' +
+        '@media print{:root{--rp-bg:#fff;--rp-fg:#0f172a;--rp-mut:#475569;--rp-line:#cbd5e1;--rp-card:#f8fafc;--rp-bar:#e2e8f0}}' + REPORT_CSS + '</style>';
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Operator assessment - ${perfEsc(perf.operator)}</title>${css}</head><body><div class="rp" style="max-width:820px;margin:auto">${perfReportHTML()}</div></body></html>`;
+      perfDownload(`assessment-${perf.operator.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}.html`, 'text/html', html);
+      perfSaveSession();
+    }
+    function perfDownloadJSON() {
+      const A = perfAssessment(); if (!A) return;
+      const { ses, cur } = A;
+      perfDownload('assessment.json', 'application/json', JSON.stringify({
+        operator: perf.operator, mission: perf.scenarioId, date: new Date().toISOString(), passed: A.pass, unmet: A.need,
+        session: { rating: ses.rating, accuracy: ses.acc, dPrime: ses.dp, criterion: ses.c, hazardGrabs: ses.haz, units: ses.n, components: { accuracy: ses.acc, discrimination: ses.disc, safety: ses.safety, anticipation: ses.antic, consistency: ses.cons } },
+        currentRate: { rating: cur.rating, window: PERF_WINDOW }, ratingHistory: perf.history
+      }, null, 2));
+    }
+    function perfRunRecommendedDrill() {
+      const A = perfAssessment();
+      if (!A || !A.drill) return;
+      perfCloseReport();
+      if (aiStartDrill(A.drill)) aiSay(`Drill started: the next 5 units are ${A.drill === 'red' ? 'ORANGE' : A.drill.toUpperCase()}. Focus: ${A.drillWhy}.`, 'tutorial', { title: 'DRILL', text: `Next 5: ${A.drill}` });
+    }
+    function perfCoachSummary() {
+      const cur = perfRate(perf.all.slice(-PERF_WINDOW)), ses = perfRate(perf.all);
+      if (!cur) return 'You have not sorted anything yet, so there is no rating. Play a few units and ask again.';
+      const f = perfFocus(cur);
+      return `Your current rate (last ${cur.n} units) is ${cur.rating.toFixed(0)}, ${PERF_TIERS[perfTier(cur.rating)][1]}. Session average ${ses.rating.toFixed(0)}. Weakest area: ${f[1].toLowerCase()} at ${(cur[f[0]] * 100).toFixed(0)}%. ${PERF_ADVICE[f[0]]}`;
+    }
+    function perfRatingLine() {
+      const cur = perfRate(perf.all.slice(-PERF_WINDOW));
+      return cur ? ` Operator rating ${cur.rating.toFixed(0)} (${PERF_TIERS[perfTier(cur.rating)][1]}).` : '';
+    }
+
+    /*************************************************************************
+     * 13d. SCENE DRESSING: shipping containers, pallets, hazmat cage,
+     * forklift, AGVs, floor lanes, back-wall signage and a live status board
+     * (the board is in the 3D world so it also shows inside the headset).
+     *************************************************************************/
+    const world = { dirty: true, boardKey: '', signKey: '', agvs: [], beacon: null, lastDraw: 0 };
+    function worldCanvas(w, h) { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
+    (function perfBuildWorld() {
+      const grp = new THREE.Group(); scene.add(grp);
+      const std = (color, rough = 0.7, metal = 0.2) => new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal });
+      let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+
+      // Shipping containers (instanced, corrugated texture, tinted per instance)
+      const cc = worldCanvas(128, 128), cg = cc.getContext('2d');
+      cg.fillStyle = '#d3dae3'; cg.fillRect(0, 0, 128, 128);
+      for (let x = 0; x < 128; x += 8) { cg.fillStyle = 'rgba(0,0,0,.32)'; cg.fillRect(x, 0, 3, 128); cg.fillStyle = 'rgba(255,255,255,.14)'; cg.fillRect(x + 4, 0, 2, 128); }
+      const ctex = new THREE.CanvasTexture(cc); ctex.wrapS = ctex.wrapT = THREE.RepeatWrapping; ctex.repeat.set(4, 1);
+      const tints = [0x4b5d73, 0x7a3b2e, 0x2f5a73, 0x55663a, 0x6b6f76, 0x8a6a2f];
+      const slots = [];
+      [-1, 1].forEach(side => [5.8, 8.5].forEach(x => [-14, -20.5, -27, -33.5].forEach(z => {
+        const h = 1 + Math.floor(rnd() * 3); for (let y = 0; y < h; y++) slots.push({ x: side * x + (rnd() - 0.5) * 0.15, y: 1.3 + y * 2.6, z, c: tints[Math.floor(rnd() * tints.length)] });
+      })));
+      const cont = new THREE.InstancedMesh(new THREE.BoxGeometry(2.45, 2.6, 6.1), new THREE.MeshStandardMaterial({ map: ctex, roughness: 0.75, metalness: 0.3 }), slots.length);
+      const dm = new THREE.Object3D(), col = new THREE.Color();
+      slots.forEach((s, i) => { dm.position.set(s.x, s.y, s.z); dm.updateMatrix(); cont.setMatrixAt(i, dm.matrix); cont.setColorAt(i, col.setHex(s.c)); });
+      grp.add(cont);
+      // Container ID plates on the inner stacks
+      ['MSKU 481 920', 'TGHU 330 175', 'CMAU 902 446', 'HLXU 218 803'].forEach((txt, i) => {
+        const c = worldCanvas(256, 64), g = c.getContext('2d');
+        g.fillStyle = 'rgba(0,0,0,0)'; g.clearRect(0, 0, 256, 64); g.fillStyle = '#f1f5f9'; g.font = '600 34px Arial'; g.textAlign = 'center'; g.fillText(txt, 128, 44);
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.4), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true }));
+        const side = i % 2 ? 1 : -1;
+        m.position.set(side * (5.8 - 1.235), 2.2, -14 - Math.floor(i / 2) * 6.5); m.rotation.y = side * -Math.PI / 2 ; grp.add(m);
+      });
+
+      // Pallets with cartons
+      const palletM = std(0x6b4f2a, 0.9, 0), cartonM = std(0xb08968, 0.85, 0);
+      [[5.2, -5.0], [6.7, -5.4], [-6.6, -6.2]].forEach(([x, z]) => {
+        const p = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.15, 1.0), palletM); p.position.set(x, 0.075, z); grp.add(p);
+        for (let i = 0; i < 4; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.42, 0.45), cartonM); b.position.set(x + (i % 2 - 0.5) * 0.55, 0.36 + Math.floor(i / 2) * 0.43, z + (rnd() - 0.5) * 0.08); grp.add(b); }
+      });
+
+      // Hazmat cage with green drums
+      const drumM = std(0x15803d, 0.5, 0.4), bandM = std(0xfacc15, 0.5, 0.2);
+      for (let i = 0; i < 6; i++) {
+        const d = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.9, 16), drumM); d.position.set(-7.6 + (i % 3) * 0.72, 0.45, -9.2 - Math.floor(i / 3) * 0.72); grp.add(d);
+        const b = new THREE.Mesh(new THREE.CylinderGeometry(0.31, 0.31, 0.08, 16), bandM); b.position.copy(d.position); b.position.y = 0.62; grp.add(b);
+      }
+      const cageM = std(0xfacc15, 0.4, 0.5);
+      [[-8.15, -8.7], [-6.2, -8.7], [-8.15, -10.4], [-6.2, -10.4]].forEach(([x, z]) => { const post = new THREE.Mesh(new THREE.BoxGeometry(0.07, 1.4, 0.07), cageM); post.position.set(x, 0.7, z); grp.add(post); });
+      const hs = worldCanvas(256, 96), hg = hs.getContext('2d');
+      hg.fillStyle = '#facc15'; hg.fillRect(0, 0, 256, 96); hg.fillStyle = '#111827'; hg.font = '700 40px Arial'; hg.textAlign = 'center'; hg.fillText('HAZMAT', 128, 44); hg.font = '600 22px Arial'; hg.fillText('STORAGE \u00B7 NO ENTRY', 128, 76);
+      const hsign = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 0.56), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(hs) })); hsign.position.set(-7.2, 1.55, -8.65); grp.add(hsign);
+
+      // Forklift
+      const fk = new THREE.Group(), fy = std(0xf59e0b, 0.5, 0.3), dk = std(0x1f2937, 0.6, 0.5);
+      const fb = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.7, 1.9), fy); fb.position.set(0, 0.65, 0.2); fk.add(fb);
+      const cw = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.8, 0.5), fy); cw.position.set(0, 0.7, 1.2); fk.add(cw);
+      [[-0.5, -0.5], [0.5, -0.5], [-0.5, 0.2], [0.5, 0.2]].forEach(([x, z]) => { const p = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.1, 0.05), dk); p.position.set(x, 1.55, z + 0.1); fk.add(p); });
+      const roof = new THREE.Mesh(new THREE.BoxGeometry(1.15, 0.05, 0.85), dk); roof.position.set(0, 2.1, -0.15); fk.add(roof);
+      [-0.3, 0.3].forEach(x => { const m = new THREE.Mesh(new THREE.BoxGeometry(0.07, 2.3, 0.1), dk); m.position.set(x, 1.25, -0.85); fk.add(m); const f = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.05, 1.1), dk); f.position.set(x, 0.12, -1.4); fk.add(f); });
+      [[-0.6, -0.45], [0.6, -0.45], [-0.6, 0.9], [0.6, 0.9]].forEach(([x, z]) => { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 0.2, 14), dk); w.rotation.z = Math.PI / 2; w.position.set(x, 0.28, z); fk.add(w); });
+      world.beacon = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 8), new THREE.MeshBasicMaterial({ color: 0xfb923c })); world.beacon.position.set(0, 2.25, -0.15); fk.add(world.beacon);
+      fk.position.set(-5.2, 0, -3.6); fk.rotation.y = 0.55; grp.add(fk);
+
+      // AGVs carrying cartons back and forth beyond the catwalk
+      [{ z: -8.4, side: 1 }, { z: -10.3, side: 1 }].forEach((cfg, i) => {
+        const a = new THREE.Group();
+        const body = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.28, 0.9), std(0x64748b, 0.5, 0.5)); body.position.y = 0.2; a.add(body);
+        const strip = new THREE.Mesh(new THREE.BoxGeometry(1.52, 0.05, 0.06), new THREE.MeshBasicMaterial({ color: 0x4ade80 })); strip.position.set(0, 0.28, 0.46); a.add(strip);
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.5, 0.6), cartonM); box.position.y = 0.6; a.add(box);
+        a.position.set(cfg.side * 8, 0, cfg.z); grp.add(a); world.agvs.push({ g: a, side: cfg.side, phase: i * 2.1 });
+      });
+
+      // Floor lanes
+      const lc = worldCanvas(64, 64), lg = lc.getContext('2d');
+      lg.fillStyle = '#facc15'; lg.fillRect(0, 0, 64, 40); lg.fillStyle = 'rgba(0,0,0,0)'; lg.clearRect(0, 40, 64, 24);
+      const ltex = new THREE.CanvasTexture(lc); ltex.wrapS = ltex.wrapT = THREE.RepeatWrapping; ltex.repeat.set(1, 40);
+      [-4.35, 4.35].forEach(x => {
+        const m = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 60), new THREE.MeshBasicMaterial({ map: ltex, transparent: true, opacity: 0.8 }));
+        m.rotation.x = -Math.PI / 2; m.position.set(x, 0.03, -33); grp.add(m);
+      });
+
+      // Back wall + scenario sign
+      const wall = new THREE.Mesh(new THREE.PlaneGeometry(60, 16), std(0x0b1222, 0.95, 0.05)); wall.position.set(0, 8, -41); grp.add(wall);
+      world.signCanvas = worldCanvas(2048, 384); world.signTex = new THREE.CanvasTexture(world.signCanvas);
+      const sign = new THREE.Mesh(new THREE.PlaneGeometry(26, 4.9), new THREE.MeshBasicMaterial({ map: world.signTex })); sign.position.set(0, 7.2, -40.8); grp.add(sign);
+
+      // Status board, hung high so it never covers incoming cargo
+      world.boardCanvas = worldCanvas(1024, 512); world.boardTex = new THREE.CanvasTexture(world.boardCanvas);
+      const frame = new THREE.Mesh(new THREE.BoxGeometry(8.3, 4.3, 0.12), std(0x0f172a, 0.6, 0.6)); frame.position.set(0, 8.2, -23.1); grp.add(frame);
+      const board = new THREE.Mesh(new THREE.PlaneGeometry(8, 4), new THREE.MeshBasicMaterial({ map: world.boardTex })); board.position.set(0, 8.2, -23.02); grp.add(board);
+      [-3.6, 3.6].forEach(x => { const r = new THREE.Mesh(new THREE.BoxGeometry(0.08, 3.2, 0.08), std(0x334155, 0.5, 0.8)); r.position.set(x, 10.2, -23.1); grp.add(r); });
+    })();
+
+    function worldDrawSign() {
+      const g = world.signCanvas.getContext('2d'), W = 2048, H = 384, sc = perf.scenario;
+      g.fillStyle = '#0f1b33'; g.fillRect(0, 0, W, H);
+      g.strokeStyle = '#d97706'; g.lineWidth = 10; g.strokeRect(14, 14, W - 28, H - 28);
+      g.textAlign = 'center'; g.fillStyle = '#f1f5f9'; g.font = '700 150px Arial, sans-serif'; g.fillText(sc.sign[0], W / 2, 180);
+      g.fillStyle = '#fbbf24'; g.font = '600 90px Arial, sans-serif'; g.fillText(sc.sign[1], W / 2, 300);
+      world.signTex.needsUpdate = true;
+    }
+    function worldDrawBoard(now) {
+      const g = world.boardCanvas.getContext('2d'), W = 1024, H = 512, sc = perf.scenario;
+      const cur = perfRate(perf.all.slice(-PERF_WINDOW)), ses = perfRate(perf.all);
+      const ti = cur ? perfTier(cur.rating) : 0;
+      const clock = perf.shift.active ? perfClock(perf.shift.durationMs - (now - perf.shift.startAt)) : (perf.all.length ? perfClock(perf.all[perf.all.length - 1].t - perf.all[0].t) : '00:00');
+      g.fillStyle = '#0b1220'; g.fillRect(0, 0, W, H);
+      g.fillStyle = '#122040'; g.fillRect(0, 0, W, 84);
+      g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillStyle = '#e2e8f0'; g.font = '600 34px Arial, sans-serif'; g.fillText(sc.name, 28, 42);
+      g.textAlign = 'right'; g.fillStyle = '#94a3b8'; g.font = '500 28px Arial, sans-serif'; g.fillText(perf.operator, W - 28, 42);
+      g.textAlign = 'left';
+      g.fillStyle = PERF_TIER_COLOURS[ti]; g.font = '700 200px Arial, sans-serif'; g.fillText(cur ? cur.rating.toFixed(0) : '\u2014', 36, 220);
+      g.font = '600 38px Arial, sans-serif'; g.fillText(cur ? PERF_TIERS[ti][1] : 'Not rated', 40, 340);
+      g.fillStyle = '#64748b'; g.font = '500 24px Arial, sans-serif'; g.fillText('current rate, last ' + PERF_WINDOW + ' units', 40, 385);
+      const rows = [['Accuracy', cur ? (cur.acc * 100).toFixed(0) + '%' : '\u2014'], ['Hazard grabs', ses ? String(ses.haz) : '0'], ['Units sorted', String(perf.all.length)],
+        ['Units / min', String(perf.all.filter(e => now - e.t < 60000).length)], [perf.shift.active ? 'Shift time left' : 'Session time', clock]];
+      rows.forEach((r, i) => {
+        const y = 140 + i * 62;
+        g.textAlign = 'left'; g.fillStyle = '#94a3b8'; g.font = '500 30px Arial, sans-serif'; g.fillText(r[0], 560, y);
+        g.textAlign = 'right'; g.fillStyle = '#f1f5f9'; g.font = '700 38px Arial, sans-serif'; g.fillText(r[1], W - 36, y);
+        g.fillStyle = '#1e293b'; g.fillRect(560, y + 26, W - 596, 2);
+      });
+      const bx = 40, by = 440, bw = W - 80;
+      g.fillStyle = '#1e293b'; g.fillRect(bx, by, bw, 22);
+      g.fillStyle = PERF_TIER_COLOURS[ti]; g.fillRect(bx, by, bw * (cur ? cur.rating / 100 : 0), 22);
+      g.fillStyle = '#f1f5f9'; g.fillRect(bx + bw * sc.targets.rating / 100 - 2, by - 8, 4, 38);
+      world.boardTex.needsUpdate = true;
+    }
+    function perfWorldUpdate(now) {
+      const sKey = perf.scenarioId;
+      if (world.signKey !== sKey) { world.signKey = sKey; worldDrawSign(); }
+      if (world.dirty || now - world.lastDraw > 500) {
+        const key = [perf.all.length, perf.history[perf.history.length - 1], perf.operator, perf.scenarioId, perf.shift.active ? Math.floor(now / 1000) : Math.floor(((perf.all[perf.all.length - 1] || {}).t - (perf.all[0] || {}).t) / 1000) || 0, Math.floor(now / 5000)].join('|');
+        if (key !== world.boardKey || world.dirty) { world.boardKey = key; worldDrawBoard(now); }
+        world.dirty = false; world.lastDraw = now;
+      }
+      const t = now / 1000;
+      world.agvs.forEach(a => { const k = Math.sin(t * 0.35 + a.phase); a.g.position.x = a.side * (9 + k * 3); a.g.rotation.y = k > 0 ? 0 : Math.PI; });
+      if (world.beacon) world.beacon.visible = Math.floor(t * 2) % 2 === 0;
+    }
+
+    (function perfBoot() {
+      document.getElementById('mission-name').value = perf.operator;
+      perfUpdateUI(true);
+      let seen = false; try { seen = !!localStorage.getItem('cst_mission_seen'); } catch (e) {}
+      if (!seen) perfOpenMission();
+    })();
+
+    /*************************************************************************
      * 12. MAIN ANIMATION LOOP
      *************************************************************************/
     let lastFrameTime = performance.now();
@@ -4258,6 +4949,7 @@
       botObserve(dt);
       botGhostUpdate(dt);
       botUpdateUI(false);
+      perfTick(now);
 
       // Check Interception & Hits across 3D Depth
       if (state.streamActive) {
