@@ -14,6 +14,22 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
   <style>
+    /* Calm, flat UI overrides (loaded last in this block so they win) */
+    .scada-panel {
+      background: #0d1220 !important;
+      backdrop-filter: none !important; -webkit-backdrop-filter: none !important;
+      border: 1px solid rgba(148,163,184,.18) !important;
+      box-shadow: none !important;
+      border-radius: 8px !important;
+    }
+    .font-scada, .font-mono-code { font-family: 'Inter', sans-serif !important; font-variant-numeric: tabular-nums; }
+    .uppercase { text-transform: none !important; }
+    .tracking-wider, .tracking-wide { letter-spacing: 0 !important; }
+    .animate-ping { animation: none !important; }
+    .hazard-stripe, .hazard-stripe-cyan { display: none !important; }
+    [class*="shadow-"] { box-shadow: none !important; }
+    #training-progress-bar { background: #f59e0b !important; }
+    #gaze-marker-label { font-variant-numeric: tabular-nums; }
     :root {
       --industrial-amber: #f59e0b;
       --industrial-red: #ef4444;
@@ -69,8 +85,8 @@
     .hazard-stripe-cyan {
       background: repeating-linear-gradient(
         -45deg,
-        #00e5ff,
-        #00e5ff 10px,
+        #3b82f6,
+        #3b82f6 10px,
         #091326 10px,
         #091326 20px
       );
@@ -144,16 +160,14 @@
       <div>
         <div class="flex items-center gap-2">
           <h1 class="font-scada text-sm md:text-base font-bold tracking-wider text-amber-400 flex items-center gap-2">
-            FACTORY BAY #04 <span class="text-slate-500">•</span> CARGO SORTING WINCH
+            Cargo sorting rig
           </h1>
-          <span class="text-[10px] font-mono-code uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold flex items-center gap-1">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> SCADA ONLINE
-          </span>
+          
         </div>
         <p class="text-[11px] text-slate-300 hidden sm:block">
-          <span class="text-rose-400 font-semibold"><i class="fa-solid fa-toolbox mr-0.5"></i> Red Toolbox → Left Cable Winch</span> &nbsp;|&nbsp;
-          <span class="text-sky-400 font-semibold"><i class="fa-solid fa-box mr-0.5"></i> Blue Crate → Right Cable Winch</span> &nbsp;|&nbsp;
-          <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-radiation mr-0.5"></i> Biohazard Barrels → SKIP (Crane Reject)</span>
+          <span class="text-orange-400 font-semibold"><i class="fa-solid fa-toolbox mr-0.5"></i> Orange toolbox: left winch</span> &nbsp;|&nbsp;
+          <span class="text-blue-400 font-semibold"><i class="fa-solid fa-box mr-0.5"></i> Blue crate: right winch</span> &nbsp;|&nbsp;
+          <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-radiation mr-0.5"></i> Hazard barrels: skip</span>
         </p>
       </div>
     </div>
@@ -161,29 +175,35 @@
     <!-- Center Conveyor Stream & Manual Feeder Controls -->
     <div class="flex flex-wrap items-center gap-2">
       <!-- Training Program Trigger Button -->
-      <button id="btn-start-training" onclick="toggleTrainingProgram()" class="px-3 py-1.5 rounded font-scada text-xs font-bold tracking-wide bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25 transition flex items-center gap-1.5 border border-indigo-400/40">
+      <button id="btn-start-training" onclick="toggleTrainingProgram()" class="px-3 py-1.5 rounded font-scada text-xs font-bold tracking-wide bg-slate-600 hover:bg-slate-500 text-white shadow-lg shadow-slate-500/25 transition flex items-center gap-1.5 border border-slate-400/40">
         <i id="icon-training" class="fa-solid fa-graduation-cap text-amber-300"></i>
-        <span id="label-training">START TRAINING PROGRAM</span>
+        <span id="label-training">Start training</span>
       </button>
 
       <button id="btn-toggle-stream" class="px-3 py-1.5 rounded font-scada text-xs font-bold tracking-wide bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-lg shadow-amber-500/20 transition flex items-center gap-1.5">
         <i id="icon-stream" class="fa-solid fa-pause"></i>
-        <span id="label-stream">PAUSE CONVEYOR</span>
+        <span id="label-stream">Pause conveyor</span>
       </button>
 
       <!-- Feeder Injection Buttons -->
       <div class="flex items-center bg-slate-900/90 border border-slate-700 rounded p-0.5 gap-1">
         <span class="text-[10px] text-slate-400 px-1 hidden lg:inline uppercase font-mono-code">Feed:</span>
-        <button onclick="spawnSingleBlock('red')" title="Feed Red Tool Box" class="px-2 py-1 rounded text-[11px] font-semibold bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 border border-rose-500/40 transition flex items-center gap-1">
-          <i class="fa-solid fa-toolbox text-[10px]"></i> +Red Box
+        <button onclick="spawnSingleBlock('red')" title="Feed Orange Tool Box" class="px-2 py-1 rounded text-[11px] font-semibold bg-orange-500/20 hover:bg-orange-500/40 text-orange-300 border border-orange-500/40 transition flex items-center gap-1">
+          <i class="fa-solid fa-toolbox text-[10px]"></i> +Orange Box
         </button>
-        <button onclick="spawnSingleBlock('blue')" title="Feed Blue Battery Crate" class="px-2 py-1 rounded text-[11px] font-semibold bg-sky-500/20 hover:bg-sky-500/40 text-sky-300 border border-sky-500/40 transition flex items-center gap-1">
+        <button onclick="spawnSingleBlock('blue')" title="Feed Blue Battery Crate" class="px-2 py-1 rounded text-[11px] font-semibold bg-blue-500/20 hover:bg-blue-500/40 text-blue-300 border border-blue-500/40 transition flex items-center gap-1">
           <i class="fa-solid fa-box text-[10px]"></i> +Blue Crate
         </button>
         <button onclick="spawnSingleBlock('green')" title="Feed Toxic Biohazard Barrel" class="px-2 py-1 rounded text-[11px] font-semibold bg-emerald-500/20 hover:bg-emerald-500/40 text-emerald-300 border border-emerald-500/40 transition flex items-center gap-1">
           <i class="fa-solid fa-triangle-exclamation text-[10px]"></i> +Hazard
         </button>
       </div>
+
+      <!-- Gaze aiming (VR) -->
+      <button id="btn-gaze" onclick="toggleGazeAim()" title="Aim winches with your gaze in VR (key G). Pull with the triggers." class="px-2.5 py-1.5 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-eye text-amber-400"></i>
+        <span id="label-gaze">Gaze aim: off</span>
+      </button>
 
       <!-- Control Rig Mode -->
       <button id="btn-control-mode" onclick="toggleControlMode()" class="px-2.5 py-1.5 rounded text-xs font-medium bg-slate-800 hover:bg-slate-700 text-amber-200 border border-amber-500/40 transition flex items-center gap-1.5">
@@ -208,12 +228,12 @@
         <span class="hidden md:inline">Log CSV</span>
       </button>
 
-      <button id="btn-stats-modal" onclick="toggleStatsModal()" class="px-2.5 py-1.5 rounded text-xs font-medium bg-cyan-900/80 hover:bg-cyan-800 text-cyan-200 border border-cyan-500/50 transition flex items-center gap-1" title="View Detailed Speed & 3D Item Interaction Analytics">
-        <i class="fa-solid fa-chart-pie text-cyan-400"></i>
+      <button id="btn-stats-modal" onclick="toggleStatsModal()" class="px-2.5 py-1.5 rounded text-xs font-medium bg-blue-900/80 hover:bg-blue-800 text-blue-200 border border-blue-500/50 transition flex items-center gap-1" title="View Detailed Speed & 3D Item Interaction Analytics">
+        <i class="fa-solid fa-chart-pie text-blue-400"></i>
         <span>Stats</span>
       </button>
 
-      <button onclick="resetExperiment()" class="px-2.5 py-1.5 rounded text-xs font-medium bg-rose-950/80 hover:bg-rose-900 text-rose-200 border border-rose-700/50 transition flex items-center gap-1" title="Emergency Stop & SCADA Reset">
+      <button onclick="resetExperiment()" class="px-2.5 py-1.5 rounded text-xs font-medium bg-orange-950/80 hover:bg-orange-900 text-orange-200 border border-orange-700/50 transition flex items-center gap-1" title="Emergency Stop & SCADA Reset">
         <i class="fa-solid fa-rotate-left"></i>
         <span class="hidden md:inline">Reset</span>
       </button>
@@ -226,22 +246,22 @@
 
   <!-- DETAILED SPEED & 3D ITEM INTERACTION STATS MODAL (Auto-opened via Quest 3 Controller or Button) -->
   <div id="stats-modal" class="fixed inset-0 z-50 scada-panel bg-slate-950/90 backdrop-blur-md hidden items-center justify-center p-3 md:p-6 overflow-y-auto">
-    <div class="scada-panel bg-slate-900 border-2 border-cyan-500/60 rounded-xl max-w-4xl w-full p-4 md:p-6 shadow-2xl flex flex-col gap-4 max-h-[92vh] overflow-y-auto">
-      <div class="flex items-center justify-between border-b border-cyan-500/30 pb-3">
+    <div class="scada-panel bg-slate-900 border-2 border-blue-500/60 rounded-xl max-w-4xl w-full p-4 md:p-6 shadow-2xl flex flex-col gap-4 max-h-[92vh] overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-blue-500/30 pb-3">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-lg bg-cyan-950 border border-cyan-500/50 flex items-center justify-center">
-            <i class="fa-solid fa-chart-column text-cyan-400 text-lg"></i>
+          <div class="w-10 h-10 rounded-lg bg-blue-950 border border-blue-500/50 flex items-center justify-center">
+            <i class="fa-solid fa-chart-column text-blue-400 text-lg"></i>
           </div>
           <div>
-            <h2 class="font-scada text-base md:text-lg font-bold tracking-wider text-cyan-300 uppercase">
-              Operator SCADA Telemetry & Speed/Object Interaction Matrix
+            <h2 class="font-scada text-base md:text-lg font-bold tracking-wider text-blue-300 uppercase">
+              Session statistics
             </h2>
             <p class="text-xs text-slate-400 font-mono-code">
               Meta Quest 3: Press <kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-600 text-amber-300 font-bold">A</kbd> / <kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-600 text-amber-300 font-bold">X</kbd> or <kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-600 text-amber-300 font-bold">Menu</kbd> to toggle pause & close
             </p>
           </div>
         </div>
-        <button onclick="toggleStatsModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-rose-950/80 text-slate-300 hover:text-rose-300 border border-slate-600 flex items-center justify-center transition">
+        <button onclick="toggleStatsModal()" class="w-8 h-8 rounded-lg bg-slate-800 hover:bg-orange-950/80 text-slate-300 hover:text-orange-300 border border-slate-600 flex items-center justify-center transition">
           <i class="fa-solid fa-xmark text-sm"></i>
         </button>
       </div>
@@ -262,7 +282,7 @@
       <!-- Specific 3D Icon Item Interaction Breakdown Table -->
       <div class="flex flex-col gap-2 pt-2 border-t border-slate-800">
         <div class="flex items-center justify-between">
-          <h3 class="font-scada text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-2">
+          <h3 class="font-scada text-xs font-bold uppercase tracking-wider text-blue-400 flex items-center gap-2">
             <i class="fa-solid fa-shapes"></i> Interaction by 3D Real Equipment Type
           </h3>
           <span class="text-[11px] font-mono-code text-slate-400">Hits, Misses, Reaction Times</span>
@@ -275,7 +295,7 @@
                 <th class="py-2 px-2.5">Category</th>
                 <th class="py-2 px-2.5 text-center">Interactions</th>
                 <th class="py-2 px-2.5 text-emerald-400 text-center">Hits / CR</th>
-                <th class="py-2 px-2.5 text-rose-400 text-center">Miss / FA</th>
+                <th class="py-2 px-2.5 text-orange-400 text-center">Miss / FA</th>
                 <th class="py-2 px-2.5 text-center">Yield %</th>
                 <th class="py-2 px-2.5 text-amber-300 text-center">Avg RT (ms)</th>
               </tr>
@@ -290,7 +310,7 @@
       <!-- Action Footer -->
       <div class="flex items-center justify-between pt-2 border-t border-slate-800">
         <span class="text-[11px] font-mono-code text-slate-400" id="stats-total-summary">Total Logged Units: 0</span>
-        <button onclick="toggleStatsModal()" class="px-4 py-2 rounded font-scada text-xs font-bold bg-cyan-600 hover:bg-cyan-500 text-white tracking-wide transition flex items-center gap-2">
+        <button onclick="toggleStatsModal()" class="px-4 py-2 rounded font-scada text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white tracking-wide transition flex items-center gap-2">
           <i class="fa-solid fa-play"></i> RESUME SORTING
         </button>
       </div>
@@ -298,22 +318,22 @@
   </div>
 
   <!-- TRAINING PROGRAM OVERLAY HUD BANNER -->
-  <div id="training-banner" class="fixed top-16 left-1/2 -translate-x-1/2 z-30 scada-panel px-4 py-2 rounded-lg border-2 border-indigo-500 hidden flex-col items-center gap-1.5 max-w-xl w-[92vw] shadow-2xl">
+  <div id="training-banner" class="fixed top-16 left-1/2 -translate-x-1/2 z-30 scada-panel px-4 py-2 rounded-lg border-2 border-slate-500 hidden flex-col items-center gap-1.5 max-w-xl w-[92vw] shadow-2xl">
     <div class="flex items-center justify-between w-full">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-ping"></span>
-        <span id="training-step-title" class="font-scada text-xs font-bold tracking-wider text-indigo-300 uppercase">
-          STAGE 1: RED TOOLBOX WINCH CALIBRATION
+        <span class="w-2.5 h-2.5 rounded-full bg-slate-400 animate-ping"></span>
+        <span id="training-step-title" class="font-scada text-xs font-bold tracking-wider text-slate-300 uppercase">
+          STAGE 1: ORANGE TOOLBOX WINCH CALIBRATION
         </span>
       </div>
       <span id="training-progress-text" class="font-mono-code text-[11px] font-bold text-amber-400">0 / 5 HITS</span>
     </div>
     <div class="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-700">
-      <div id="training-progress-bar" class="bg-gradient-to-r from-indigo-500 to-amber-400 h-full transition-all duration-300" style="width: 0%"></div>
+      <div id="training-progress-bar" class="bg-gradient-to-r from-slate-500 to-amber-400 h-full transition-all duration-300" style="width: 0%"></div>
     </div>
     <div class="flex items-center justify-between w-full text-[10px] text-slate-300 font-mono-code">
-      <span id="training-instruction">Intercept 5 incoming Red Toolboxes using the Left Cable Winch (L-Click / Q).</span>
-      <button onclick="stopTrainingProgram()" class="text-rose-400 hover:underline">Abort</button>
+      <span id="training-instruction">Intercept 5 incoming Orange Toolboxes using the Left Cable Winch (L-Click / Q).</span>
+      <button onclick="stopTrainingProgram()" class="text-orange-400 hover:underline">Abort</button>
     </div>
   </div>
 
@@ -370,7 +390,7 @@
           </div>
           <div class="bg-slate-900 border border-slate-800 rounded px-2 py-1">
             <div class="text-[9px] text-slate-400 uppercase">Conveyor Belt Speed</div>
-            <div id="live-auto-speed" class="text-xs font-bold text-sky-300">24.0 m/s</div>
+            <div id="live-auto-speed" class="text-xs font-bold text-blue-300">24.0 m/s</div>
           </div>
           <div class="bg-slate-900 border border-slate-800 rounded px-2 py-1 flex items-center justify-between">
             <span class="text-[9px] text-slate-400 uppercase">Hook Window ETA</span>
@@ -441,15 +461,15 @@
       <div class="pt-1 border-t border-slate-800">
         <div class="flex justify-between items-center text-[10px] text-slate-400 mb-1">
           <span>Cargo Distribution Mix:</span>
-          <span id="val-prob-summary" class="font-mono-code text-slate-200">35% Red / 35% Blue / 30% Skip</span>
+          <span id="val-prob-summary" class="font-mono-code text-slate-200">35% Orange / 35% Blue / 30% Skip</span>
         </div>
         <div class="grid grid-cols-3 gap-1.5 text-[10px]">
-          <div class="bg-rose-950/40 border border-rose-500/40 rounded p-1">
-            <div class="flex justify-between text-rose-300 font-semibold"><span>Red Box</span><span id="lbl-prob-r">35%</span></div>
+          <div class="bg-orange-950/40 border border-orange-500/40 rounded p-1">
+            <div class="flex justify-between text-orange-300 font-semibold"><span>Orange Box</span><span id="lbl-prob-r">35%</span></div>
             <input id="slider-prob-r" type="range" min="0" max="100" step="5" value="35" class="w-full mt-0.5" oninput="updateProbabilities()" />
           </div>
-          <div class="bg-sky-950/40 border border-sky-500/40 rounded p-1">
-            <div class="flex justify-between text-sky-300 font-semibold"><span>Blue Crate</span><span id="lbl-prob-b">35%</span></div>
+          <div class="bg-blue-950/40 border border-blue-500/40 rounded p-1">
+            <div class="flex justify-between text-blue-300 font-semibold"><span>Blue Crate</span><span id="lbl-prob-b">35%</span></div>
             <input id="slider-prob-b" type="range" min="0" max="100" step="5" value="35" class="w-full mt-0.5" oninput="updateProbabilities()" />
           </div>
           <div class="bg-emerald-950/40 border border-emerald-500/40 rounded p-1">
@@ -461,15 +481,15 @@
     </section>
 
     <!-- 2. FITTS'S LAW ERGONOMIC MOTOR INDEX & REGRESSION -->
-    <section class="scada-panel rounded-lg p-3 flex flex-col gap-2 border-l-2 border-l-sky-500">
+    <section class="scada-panel rounded-lg p-3 flex flex-col gap-2 border-l-2 border-l-blue-500">
       <div class="flex items-center justify-between border-b border-slate-700/70 pb-1.5">
         <div class="flex items-center gap-1.5">
-          <i class="fa-solid fa-ruler-combined text-sky-400 text-xs"></i>
+          <i class="fa-solid fa-ruler-combined text-blue-400 text-xs"></i>
           <h2 class="font-scada text-xs font-bold tracking-wider uppercase text-slate-100">
-            Fitts Motor Solver: <span class="text-sky-300 font-mono-code lowercase">Δt = a + b·log(d/w)</span>
+            Fitts Motor Solver: <span class="text-blue-300 font-mono-code lowercase">Δt = a + b·log(d/w)</span>
           </h2>
         </div>
-        <select id="select-log-base" onchange="updateFittsCalculator()" class="bg-slate-900 text-sky-300 border border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-mono-code outline-none">
+        <select id="select-log-base" onchange="updateFittsCalculator()" class="bg-slate-900 text-blue-300 border border-slate-700 rounded px-1.5 py-0.5 text-[10px] font-mono-code outline-none">
           <option value="2" selected>log₂(d/w)</option>
           <option value="e">ln(d/w)</option>
           <option value="10">log₁₀(d/w)</option>
@@ -478,10 +498,10 @@
       </div>
 
       <!-- Live Calculated Formula & Inter-Grab Telemetry -->
-      <div class="bg-slate-950/90 border border-sky-500/40 rounded p-2 font-mono-code">
+      <div class="bg-slate-950/90 border border-blue-500/40 rounded p-2 font-mono-code">
         <div class="flex justify-between items-center text-[10px] text-slate-400">
           <span id="formula-symbolic">Δt = a + b · log₂(d / w)</span>
-          <span class="text-sky-300">Index ID = <strong id="val-fitts-id">—</strong></span>
+          <span class="text-blue-300">Index ID = <strong id="val-fitts-id">—</strong></span>
         </div>
         <div id="formula-numeric" class="text-[11px] text-amber-300 font-semibold mt-0.5 truncate">
           Awaiting 2 consecutive cable winch grabs...
@@ -494,7 +514,7 @@
           </div>
           <div class="bg-slate-900 rounded p-1">
             <div class="text-[8px] uppercase text-slate-400">3D Dist (d)</div>
-            <div id="val-fitts-d" class="text-xs font-bold text-sky-300">— m</div>
+            <div id="val-fitts-d" class="text-xs font-bold text-blue-300">— m</div>
           </div>
           <div class="bg-slate-900 rounded p-1">
             <div class="text-[8px] uppercase text-slate-400">Ratio (d/w)</div>
@@ -534,38 +554,57 @@
   <!-- RIGHT PANEL: INDUSTRIAL SDT METRICS & CRANE TELEMETRY LOG -->
   <aside id="panel-right" class="fixed top-16 right-2 bottom-12 w-80 md:w-96 max-w-[92vw] z-20 flex flex-col gap-2 overflow-y-auto pl-1 transition-transform duration-300">
 
-    <!-- A.X.E.L. AI FLOOR SUPERVISOR (permanently docked, top-right) -->
-    <section id="ai-coach-dock" class="scada-panel rounded-lg p-3 flex flex-col gap-2 border-r-2 border-r-violet-500 shrink-0">
+    <!-- Coach AI FLOOR SUPERVISOR (permanently docked, top-right) -->
+    <section id="ai-coach-dock" class="scada-panel rounded-lg p-3 flex flex-col gap-2 border-r-2 border-r-slate-500 shrink-0">
       <div class="flex items-center justify-between border-b border-slate-700/70 pb-1.5">
         <div class="flex items-center gap-2">
           <span class="relative flex w-2.5 h-2.5">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-60"></span>
-            <span class="relative inline-flex rounded-full w-2.5 h-2.5 bg-violet-400"></span>
+            <span class="relative inline-flex rounded-full w-2 h-2 bg-slate-400"></span>
           </span>
-          <h2 class="font-scada text-xs font-bold tracking-wider uppercase text-violet-300">A.X.E.L. Floor Supervisor</h2>
+          <h2 class="font-scada text-xs font-bold tracking-wider uppercase text-slate-300">Coach</h2>
         </div>
-        <span id="ai-mode-badge" class="text-[9px] font-mono-code px-1.5 py-0.5 rounded bg-violet-500/20 text-violet-200 border border-violet-400/40">LOCAL COACH</span>
+        <span id="ai-mode-badge" class="text-[9px] font-mono-code px-1.5 py-0.5 rounded bg-slate-500/20 text-slate-200 border border-slate-400/40">Local</span>
       </div>
       <div id="ai-transcript" class="flex flex-col gap-1.5 max-h-44 min-h-[72px] overflow-y-auto font-mono-code text-[11px] pr-1"></div>
       <div id="ai-drill-status" class="hidden items-center justify-between text-[10px] font-mono-code px-2 py-1 rounded bg-amber-500/10 border border-amber-500/40 text-amber-200">
         <span id="ai-drill-label">DRILL</span>
-        <button onclick="aiCancelDrill()" class="text-rose-300 hover:underline">cancel</button>
+        <button onclick="aiCancelDrill()" class="text-orange-300 hover:underline">cancel</button>
       </div>
       <div class="flex flex-wrap gap-1">
         <button onclick="askAi('How am I doing?')" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600">How am I doing?</button>
-        <button onclick="askAi('Tips for red cargo')" class="px-1.5 py-0.5 rounded text-[10px] bg-rose-950/60 hover:bg-rose-900/60 text-rose-200 border border-rose-700/50">Red tips</button>
-        <button onclick="askAi('Tips for blue cargo')" class="px-1.5 py-0.5 rounded text-[10px] bg-sky-950/60 hover:bg-sky-900/60 text-sky-200 border border-sky-700/50">Blue tips</button>
+        <button onclick="askAi('Tips for orange cargo')" class="px-1.5 py-0.5 rounded text-[10px] bg-orange-950/60 hover:bg-orange-900/60 text-orange-200 border border-orange-700/50">Orange tips</button>
+        <button onclick="askAi('Tips for blue cargo')" class="px-1.5 py-0.5 rounded text-[10px] bg-blue-950/60 hover:bg-blue-900/60 text-blue-200 border border-blue-700/50">Blue tips</button>
         <button onclick="askAi('What about hazards?')" class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-950/60 hover:bg-emerald-900/60 text-emerald-200 border border-emerald-700/50">Hazards</button>
         <button onclick="askAi('How do the VR controls work?')" class="px-1.5 py-0.5 rounded text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600">VR controls</button>
       </div>
       <div class="flex gap-1">
-        <input id="ai-input" type="text" maxlength="160" autocomplete="off" placeholder="Ask A.X.E.L. about the task..."
+        <input id="ai-input" type="text" maxlength="160" autocomplete="off" placeholder="Ask the coach…"
                onkeydown="if (event.key === 'Enter') submitAiQuestion();"
-               class="flex-1 min-w-0 bg-slate-900 text-slate-200 border border-slate-700 rounded px-2 py-1 text-[11px] font-mono-code focus:outline-none focus:border-violet-400" />
-        <button onclick="submitAiQuestion()" class="px-2 py-1 rounded text-[11px] font-bold bg-violet-600 hover:bg-violet-500 text-white">Ask</button>
+               class="flex-1 min-w-0 bg-slate-900 text-slate-200 border border-slate-700 rounded px-2 py-1 text-[11px] font-mono-code focus:outline-none focus:border-slate-400" />
+        <button onclick="submitAiQuestion()" class="px-2 py-1 rounded text-[11px] font-bold bg-slate-600 hover:bg-slate-500 text-white">Ask</button>
       </div>
     </section>
 
+
+    <!-- MOVEMENT TRAINER -->
+    <section id="bot-panel" class="scada-panel p-3 flex flex-col gap-2 shrink-0">
+      <div class="flex items-center justify-between border-b border-slate-700/70 pb-1.5">
+        <h2 class="text-xs font-semibold text-slate-100">Movement trainer</h2>
+        <span id="bot-status" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-600">Training</span>
+      </div>
+      <div class="w-full h-1.5 bg-slate-900 rounded overflow-hidden"><div id="bot-progress-bar" class="h-full bg-amber-500 transition-all duration-300" style="width:0%"></div></div>
+      <div id="bot-req" class="flex flex-col gap-0.5 text-[10px] text-slate-300"></div>
+      <div id="bot-profile" class="flex flex-col gap-0.5 text-[10px] text-slate-300 border-t border-slate-700/70 pt-1.5">Still collecting your movement.</div>
+      <p id="bot-follow" class="text-[10px] text-slate-300"></p>
+      <p id="bot-note" class="text-[10px] text-amber-300"></p>
+      <label class="flex items-center gap-1 text-[10px] text-slate-300">Hits in training period
+        <input id="bot-threshold" type="number" min="10" max="200" value="40" onchange="botSetThreshold(this.value)" class="w-14 bg-slate-900 border border-slate-700 rounded px-1 py-0.5 text-slate-200" /></label>
+      <div class="flex gap-1">
+        <button onclick="toggleBot()" class="flex-1 px-2 py-1 rounded text-[11px] font-semibold bg-amber-500 hover:bg-amber-400 text-slate-950"><span id="bot-btn-label">Show demo</span> (B)</button>
+        <button onclick="botForget()" class="px-2 py-1 rounded text-[11px] bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600">Retrain</button>
+      </div>
+      <p class="text-[10px] text-slate-500">The demo is two translucent winches showing a clean version of your own best approach, with a ring where the winch should be. It never controls your winches or changes your score.</p>
+    </section>
 
     <!-- 1. SIGNAL DETECTION THEORY (SDT) & MOTOR BANDWIDTH CARD -->
     <section class="scada-panel rounded-lg p-3 flex flex-col gap-2.5 border-r-2 border-r-amber-500">
@@ -573,7 +612,7 @@
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-chart-line text-amber-400 text-xs"></i>
           <h2 class="font-scada text-xs font-bold tracking-wider uppercase text-slate-100">
-            Factory Quality & SDT Metrics
+            Signal detection metrics
           </h2>
         </div>
         <span id="sdt-total-trials" class="text-[10px] font-mono-code px-2 py-0.5 rounded bg-slate-800 text-slate-300">
@@ -616,33 +655,33 @@
         </div>
 
         <!-- CORRECT REJECTION RATE -->
-        <div class="bg-sky-950/40 border border-sky-500/40 rounded p-2">
+        <div class="bg-blue-950/40 border border-blue-500/40 rounded p-2">
           <div class="flex justify-between items-center">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-300">Safe Reject</span>
-            <span id="count-cr" class="text-[10px] font-mono-code text-sky-200 bg-sky-500/20 px-1.5 rounded">0</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-blue-300">Safe Reject</span>
+            <span id="count-cr" class="text-[10px] font-mono-code text-blue-200 bg-blue-500/20 px-1.5 rounded">0</span>
           </div>
           <div class="flex items-baseline justify-between mt-1">
-            <span id="rate-cr-pct" class="font-scada text-lg font-bold text-sky-400">0.0%</span>
+            <span id="rate-cr-pct" class="font-scada text-lg font-bold text-blue-400">0.0%</span>
             <span id="rate-cr-dec" class="font-mono-code text-[11px] text-slate-400">P = 0.00</span>
           </div>
           <div class="w-full h-1.5 bg-slate-900 rounded overflow-hidden mt-1">
-            <div id="bar-cr" class="h-full bg-sky-400 transition-all duration-300" style="width: 0%"></div>
+            <div id="bar-cr" class="h-full bg-blue-400 transition-all duration-300" style="width: 0%"></div>
           </div>
           <p class="text-[9px] text-slate-400 mt-1">Hazard barrel bypassed safely</p>
         </div>
 
         <!-- FALSE ALARM RATE -->
-        <div class="bg-rose-950/40 border border-rose-500/40 rounded p-2">
+        <div class="bg-orange-950/40 border border-orange-500/40 rounded p-2">
           <div class="flex justify-between items-center">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-rose-300">Hazard Alarm</span>
-            <span id="count-fa" class="text-[10px] font-mono-code text-rose-200 bg-rose-500/20 px-1.5 rounded">0</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-orange-300">Hazard Alarm</span>
+            <span id="count-fa" class="text-[10px] font-mono-code text-orange-200 bg-orange-500/20 px-1.5 rounded">0</span>
           </div>
           <div class="flex items-baseline justify-between mt-1">
-            <span id="rate-fa-pct" class="font-scada text-lg font-bold text-rose-400">0.0%</span>
+            <span id="rate-fa-pct" class="font-scada text-lg font-bold text-orange-400">0.0%</span>
             <span id="rate-fa-dec" class="font-mono-code text-[11px] text-slate-400">P = 0.00</span>
           </div>
           <div class="w-full h-1.5 bg-slate-900 rounded overflow-hidden mt-1">
-            <div id="bar-fa" class="h-full bg-rose-500 transition-all duration-300" style="width: 0%"></div>
+            <div id="bar-fa" class="h-full bg-orange-500 transition-all duration-300" style="width: 0%"></div>
           </div>
           <p class="text-[9px] text-slate-400 mt-1">Hooked Hazard or wrong winch</p>
         </div>
@@ -661,13 +700,13 @@
         </div>
 
         <!-- FITTS PARAMETER b: Bandwidth -->
-        <div class="bg-slate-900 border border-sky-500/40 rounded p-2">
+        <div class="bg-slate-900 border border-blue-500/40 rounded p-2">
           <div class="flex justify-between items-center">
-            <span class="text-[10px] font-bold uppercase tracking-wider text-sky-300">Bandwidth (b)</span>
-            <span id="card-fitts-ip" class="text-[9px] font-mono-code text-sky-200 bg-sky-500/20 px-1.5 rounded">IP: — b/s</span>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-blue-300">Bandwidth (b)</span>
+            <span id="card-fitts-ip" class="text-[9px] font-mono-code text-blue-200 bg-blue-500/20 px-1.5 rounded">IP: — b/s</span>
           </div>
           <div class="flex items-baseline justify-between mt-1">
-            <span id="card-fitts-b" class="font-scada text-base font-bold text-sky-400">— ms/bit</span>
+            <span id="card-fitts-b" class="font-scada text-base font-bold text-blue-400">— ms/bit</span>
           </div>
           <p class="text-[9px] text-slate-400 mt-1">Motor slope & throughput</p>
         </div>
@@ -682,7 +721,7 @@
           </div>
           <div>
             <div class="text-[9px] text-slate-400 uppercase">Criterion c</div>
-            <div id="val-criterion" class="font-mono-code text-xs font-bold text-sky-300">0.00</div>
+            <div id="val-criterion" class="font-mono-code text-xs font-bold text-blue-300">0.00</div>
           </div>
           <div>
             <div class="text-[9px] text-slate-400 uppercase">Sorting Yield</div>
@@ -697,7 +736,7 @@
     </section>
 
     <!-- 2. SCADA EVENT & WINCH TELEMETRY LOG -->
-    <section class="scada-panel rounded-lg p-3 flex-1 flex flex-col min-h-[190px] overflow-hidden border-r-2 border-r-sky-500">
+    <section class="scada-panel rounded-lg p-3 flex-1 flex flex-col min-h-[190px] overflow-hidden border-r-2 border-r-blue-500">
       <div class="flex items-center justify-between border-b border-slate-700/70 pb-1.5 mb-1.5">
         <div class="flex items-center gap-2">
           <i class="fa-solid fa-list-check text-amber-400 text-xs"></i>
@@ -717,7 +756,7 @@
               <th class="py-1 px-1 text-amber-300">Spd</th>
               <th class="py-1 px-1">d/w</th>
               <th class="py-1 px-1 text-amber-200">Δt</th>
-              <th class="py-1 px-1 text-sky-300">a(RT)</th>
+              <th class="py-1 px-1 text-blue-300">a(RT)</th>
               <th class="py-1 px-1 text-amber-400">b(BW)</th>
               <th class="py-1 px-1">Outcome</th>
             </tr>
@@ -737,14 +776,14 @@
   <!-- BOTTOM OPERATOR INSTRUCTIONS & CABLE RIG LEGEND -->
   <footer class="fixed bottom-2 left-1/2 -translate-x-1/2 z-20 px-4 py-1.5 rounded scada-panel border border-slate-700 flex items-center gap-4 text-[11px] whitespace-nowrap shadow-xl">
     <div class="flex items-center gap-1.5">
-      <span class="w-3 h-3 rounded bg-rose-600 shadow-[0_0_8px_#ef4444] border border-rose-400"></span>
-      <span class="text-rose-300 font-semibold">Left Cable Winch:</span>
+      <span class="w-3 h-3 rounded bg-orange-600 shadow-[0_0_8px_#ef4444] border border-orange-400"></span>
+      <span class="text-orange-300 font-semibold">Left Cable Winch:</span>
       <span class="text-slate-300"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-600 text-[10px]">Left-Click</kbd> or <kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-600 text-[10px]">Q</kbd></span>
     </div>
     <div class="h-3 w-px bg-slate-700"></div>
     <div class="flex items-center gap-1.5">
-      <span class="w-3 h-3 rounded bg-sky-600 shadow-[0_0_8px_#0284c7] border border-sky-400"></span>
-      <span class="text-sky-300 font-semibold">Right Cable Winch:</span>
+      <span class="w-3 h-3 rounded bg-blue-600 shadow-[0_0_8px_#0284c7] border border-blue-400"></span>
+      <span class="text-blue-300 font-semibold">Right Cable Winch:</span>
       <span class="text-slate-300"><kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-600 text-[10px]">Right-Click</kbd> or <kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-600 text-[10px]">E</kbd></span>
     </div>
     <div class="h-3 w-px bg-slate-700 hidden sm:block"></div>
@@ -758,7 +797,7 @@
       <span class="text-slate-300">VR: <kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-600 text-[10px]">Trigger</kbd> pull &nbsp; <kbd class="px-1.5 py-0.5 bg-slate-800 rounded border border-slate-600 text-[10px]">A / X</kbd> pause + stats</span>
     </div>
     <div class="h-3 w-px bg-slate-700"></div>
-    <button onclick="toggleStatsModal()" class="text-cyan-300 hover:text-cyan-200 font-bold flex items-center gap-1">
+    <button onclick="toggleStatsModal()" class="text-blue-300 hover:text-blue-200 font-bold flex items-center gap-1">
       <i class="fa-solid fa-chart-pie"></i> Stats (S / Tab)
     </button>
   </footer>
@@ -811,9 +850,9 @@
           high: { label: 'High (> 28 m/s)', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 }
         },
         byIcon: {
-          'Pipe Wrench': { category: 'Red Tools', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 },
-          'Gear Cog': { category: 'Red Tools', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 },
-          'Sledgehammer': { category: 'Red Tools', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 },
+          'Pipe Wrench': { category: 'Orange Tools', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 },
+          'Gear Cog': { category: 'Orange Tools', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 },
+          'Sledgehammer': { category: 'Orange Tools', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 },
           'Battery Module': { category: 'Blue Power', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 },
           'Microchip': { category: 'Blue Power', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 },
           'Dynamo Rotor': { category: 'Blue Power', total: 0, hits: 0, misses: 0, fa: 0, cr: 0, sumRT: 0, countRT: 0 },
@@ -823,7 +862,7 @@
         }
       },
 
-      // A.X.E.L. AI floor supervisor tracking
+      // Coach AI floor supervisor tracking
       aiSupervisor: {
         missStreak: { red: 0, blue: 0 },
         faStreak: 0,
@@ -1007,14 +1046,14 @@
     /*************************************************************************
      * 3b. VR PLAYER RIG, HAND CONTROLLERS & HAPTICS
      * The camera and both controllers live under one group so the operator can
-     * be stood on the catwalk in VR. Left hand = Red winch, right hand = Blue.
+     * be stood on the catwalk in VR. Left hand = Orange winch, right hand = Blue.
      *************************************************************************/
     const playerRig = new THREE.Group();
     playerRig.add(camera);
     scene.add(playerRig);
     const VR_RIG_POS = new THREE.Vector3(0, 0.25, 2.2);        // feet on the catwalk deck
     const DESKTOP_CAM_POS = new THREE.Vector3(0, 2.15, 3.4);   // 2D monitor viewpoint
-    const HAND_COLOR = { left: 0xff2a5f, right: 0x00e5ff };
+    const HAND_COLOR = { left: 0xf97316, right: 0x3b82f6 };
 
     const vrControllers = [0, 1].map(i => {
       const c = renderer.xr.getController(i);
@@ -1082,6 +1121,101 @@
       });
     }
 
+
+    /*************************************************************************
+     * 3c. GAZE AIMING (VR)
+     * Source priority: WebXR eye-gaze input (targetRayMode 'gaze'), where the
+     * headset exposes one. Otherwise head gaze (view direction). The Quest 3
+     * has no eye tracker, and the Quest Pro's is not exposed to WebXR, so on
+     * those headsets this runs on head gaze. Gaze places both winches; the
+     * controller triggers still fire the pulls (left = red, right = blue).
+     *************************************************************************/
+    const gaze = {
+      enabled: false,
+      source: 'none',                       // 'eye' | 'head' | 'none'
+      point: new THREE.Vector3(0, 1.55, -0.5),
+      hasPoint: false,
+      deadZone: 0.03,                       // metres: ignore micro-saccades
+      smoothing: 9,                         // higher = snappier, lower = steadier
+      origin: new THREE.Vector3(),
+      dir: new THREE.Vector3(),
+      frame: null
+    };
+    const gazeMarker = new THREE.Mesh(
+      new THREE.RingGeometry(0.1, 0.125, 40),
+      new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 0.8, depthTest: false })
+    );
+    gazeMarker.renderOrder = 999; gazeMarker.visible = false; scene.add(gazeMarker);
+
+    function updateGazeRay() {
+      let found = false;
+      const session = renderer.xr.getSession && renderer.xr.getSession();
+      const ref = renderer.xr.getReferenceSpace && renderer.xr.getReferenceSpace();
+      if (session && gaze.frame && ref) {
+        for (const src of session.inputSources) {
+          if (src.targetRayMode !== 'gaze') continue;
+          const pose = gaze.frame.getPose(src.targetRaySpace, ref);
+          if (!pose) continue;
+          const t = pose.transform.position, o = pose.transform.orientation;
+          gaze.origin.set(t.x, t.y, t.z);
+          _aimQuat.set(o.x, o.y, o.z, o.w);
+          gaze.dir.set(0, 0, -1).applyQuaternion(_aimQuat);
+          playerRig.updateWorldMatrix(true, false);
+          playerRig.localToWorld(gaze.origin);
+          gaze.dir.transformDirection(playerRig.matrixWorld);
+          gaze.source = 'eye'; found = true; break;
+        }
+      }
+      if (!found) {
+        camera.updateWorldMatrix(true, false);
+        camera.getWorldPosition(gaze.origin);
+        camera.getWorldQuaternion(_aimQuat);
+        gaze.dir.set(0, 0, -1).applyQuaternion(_aimQuat);
+        gaze.source = 'head';
+      }
+    }
+
+    function updateGazeAim(dt) {
+      updateGazeRay();
+      if (gaze.dir.z >= -0.05) return;
+      const t = (state.strikeZ - gaze.origin.z) / gaze.dir.z;
+      if (t <= 0) return;
+      const tx = THREE.MathUtils.clamp(gaze.origin.x + gaze.dir.x * t, -2.5, 2.5);
+      const ty = THREE.MathUtils.clamp(gaze.origin.y + gaze.dir.y * t, WINCH_MIN_Y, WINCH_MAX_Y);
+      if (!gaze.hasPoint) { gaze.point.set(tx, ty, state.strikeZ); gaze.hasPoint = true; }
+      const dx = tx - gaze.point.x, dy = ty - gaze.point.y;
+      if (Math.hypot(dx, dy) > gaze.deadZone) {
+        const k = 1 - Math.exp(-dt * gaze.smoothing);
+        gaze.point.x += dx * k; gaze.point.y += dy * k;
+      }
+      const redOffset = state.redPullTimer > 0 ? 0 : -0.52;
+      const blueOffset = state.bluePullTimer > 0 ? 0 : 0.52;
+      state.redWinchPos.set(gaze.point.x + redOffset, gaze.point.y, state.strikeZ);
+      state.blueWinchPos.set(gaze.point.x + blueOffset, gaze.point.y, state.strikeZ);
+      gazeMarker.position.set(gaze.point.x, gaze.point.y, state.strikeZ + 0.02);
+      gazeMarker.visible = true;
+      // keep the laser pointers short and neutral while gaze is in charge
+      vrControllers.forEach(c => { c.userData.parts.laser.scale.z = 0.4; });
+    }
+
+    function toggleGazeAim() {
+      gaze.enabled = !gaze.enabled;
+      gaze.hasPoint = false;
+      gazeMarker.visible = false;
+      refreshGazeLabel();
+    }
+    function refreshGazeLabel() {
+      const el = document.getElementById('label-gaze');
+      if (!el) return;
+      let txt = 'Gaze aim: off';
+      if (gaze.enabled) txt = !renderer.xr.isPresenting ? 'Gaze aim: on (VR only)' : (gaze.source === 'eye' ? 'Gaze aim: eye' : 'Gaze aim: head');
+      if (el.textContent !== txt) el.textContent = txt;
+    }
+    window.addEventListener('keydown', e => {
+      if (e.target && e.target.matches && e.target.matches('input[type="text"], textarea')) return;
+      if (e.key === 'g' || e.key === 'G') toggleGazeAim();
+    });
+
     function vrHaptic(hand, strength = 0.7, ms = 90) {
       try {
         const session = renderer.xr.getSession && renderer.xr.getSession();
@@ -1099,6 +1233,7 @@
       vrPanelsDirty = true;
     });
     renderer.xr.addEventListener('sessionend', () => {
+      gazeMarker.visible = false; gaze.hasPoint = false; gaze.source = 'none';
       playerRig.position.set(0, 0, 0);
       camera.position.copy(DESKTOP_CAM_POS);
       camera.rotation.set(0, 0, 0);
@@ -1108,7 +1243,7 @@
     });
 
     // Vibrant Multi-Tone Industrial Factory Lighting
-    const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.45);
+    const ambientLight = new THREE.AmbientLight(0x60a5fa, 0.45);
     scene.add(ambientLight);
 
     // Warm high-intensity industrial golden sodium overhead floodlight
@@ -1117,12 +1252,12 @@
     scene.add(sodiumLight);
 
     // Vibrant Electric Cyan Backlight
-    const cyanBacklight = new THREE.DirectionalLight(0x00f0ff, 1.2);
+    const cyanBacklight = new THREE.DirectionalLight(0x60a5fa, 1.2);
     cyanBacklight.position.set(-6, 10, -25);
     scene.add(cyanBacklight);
 
     // Colored Accent Spotlights along the conveyor zone
-    const redAccentLight = new THREE.PointLight(0xff2255, 2.2, 16);
+    const redAccentLight = new THREE.PointLight(0xfb923c, 2.2, 16);
     redAccentLight.position.set(-2.8, 2.2, -0.5);
     scene.add(redAccentLight);
 
@@ -1154,8 +1289,8 @@
         envScene.add(m);
       };
       lamp(0xffd9a0, 4, 24, 8, 0, 34, 0);       // warm roof floodlights
-      lamp(0xff3d8b, 3, 10, 20, -34, 12, -6);   // magenta side glow
-      lamp(0x22d3ee, 3, 10, 20, 34, 12, -6);    // cyan side glow
+      lamp(0xfb923c, 3, 10, 20, -34, 12, -6);   // magenta side glow
+      lamp(0x60a5fa, 3, 10, 20, 34, 12, -6);    // cyan side glow
       lamp(0xffffff, 2, 16, 8, 0, 10, -40);     // bright far end of the hall
       const pmrem = new THREE.PMREMGenerator(renderer);
       scene.environment = pmrem.fromScene(envScene, 0.04).texture;
@@ -1180,8 +1315,8 @@
 
     // Underfloor Molten / Hydraulic Radiant Glow Strips
     const glowStripGeo = new THREE.PlaneGeometry(0.35, 80);
-    const glowStripMatL = new THREE.MeshBasicMaterial({ color: 0xff4d00 });
-    const glowStripMatR = new THREE.MeshBasicMaterial({ color: 0x00e5ff });
+    const glowStripMatL = new THREE.MeshBasicMaterial({ color: 0xf97316 });
+    const glowStripMatR = new THREE.MeshBasicMaterial({ color: 0x3b82f6 });
     const glowL = new THREE.Mesh(glowStripGeo, glowStripMatL);
     glowL.rotation.x = -Math.PI / 2;
     glowL.position.set(-2.8, 0.02, -25);
@@ -1220,7 +1355,7 @@
     factoryGroup.add(railRight);
 
     // Overhead High-Voltage Cable Conduits & Glowing Pneumatic Lines
-    const conduitMatCyan = new THREE.MeshBasicMaterial({ color: 0x00f0ff });
+    const conduitMatCyan = new THREE.MeshBasicMaterial({ color: 0x60a5fa });
     const conduitMatAmber = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
     const conduitGeo = new THREE.CylinderGeometry(0.045, 0.045, 80, 8);
     const pipe1 = new THREE.Mesh(conduitGeo, conduitMatCyan);
@@ -1335,7 +1470,7 @@
 
     // Running Pulsing LED Light Strips on Guide Rails
     const ledStripGeo = new THREE.BoxGeometry(0.04, 0.08, 42);
-    const ledStripMatL = new THREE.MeshBasicMaterial({ color: 0x38bdf8 });
+    const ledStripMatL = new THREE.MeshBasicMaterial({ color: 0x60a5fa });
     const ledStripMatR = new THREE.MeshBasicMaterial({ color: 0xf59e0b });
     const ledL = new THREE.Mesh(ledStripGeo, ledStripMatL);
     ledL.position.set(-1.94, 1.36, -18);
@@ -1379,7 +1514,7 @@
     const hitZoneGeo = new THREE.BoxGeometry(4.2, 1.8, hitBoxDepth);
     const hitZoneEdges = new THREE.EdgesGeometry(hitZoneGeo);
     const hitZoneLineMat = new THREE.LineBasicMaterial({
-      color: 0x38bdf8,
+      color: 0x60a5fa,
       transparent: true,
       opacity: 0.45
     });
@@ -1418,10 +1553,10 @@
 
     // Glowing Neon Cable Guide Rails for high visibility in 2D and 3D VR
     const cableGlowGeo = new THREE.BoxGeometry(0.06, 0.06, 50);
-    const cableGlowL = new THREE.Mesh(cableGlowGeo, new THREE.MeshBasicMaterial({ color: 0xff2a5f }));
+    const cableGlowL = new THREE.Mesh(cableGlowGeo, new THREE.MeshBasicMaterial({ color: 0xf97316 }));
     cableGlowL.position.set(runwayRailL_X + 0.12, runwayRailY + 0.14, -15);
     scene.add(cableGlowL);
-    const cableGlowR = new THREE.Mesh(cableGlowGeo, new THREE.MeshBasicMaterial({ color: 0x00e5ff }));
+    const cableGlowR = new THREE.Mesh(cableGlowGeo, new THREE.MeshBasicMaterial({ color: 0x3b82f6 }));
     cableGlowR.position.set(runwayRailR_X - 0.12, runwayRailY + 0.14, -15);
     scene.add(cableGlowR);
 
@@ -1659,15 +1794,15 @@
       };
     }
 
-    const redCrane = createTensionCableBridgeCrane(0xff2a5f);  // Red Bridge Crane tracks Left Winch
-    const blueCrane = createTensionCableBridgeCrane(0x00e5ff); // Blue Bridge Crane tracks Right Winch
+    const redCrane = createTensionCableBridgeCrane(0xf97316);  // Orange Bridge Crane tracks Left Winch
+    const blueCrane = createTensionCableBridgeCrane(0x3b82f6); // Blue Bridge Crane tracks Right Winch
     redCrane.pos.set(-0.8, runwayRailY, -0.5);
     blueCrane.pos.set(0.8, runwayRailY, -0.5);
     scene.add(redCrane.group);
     scene.add(blueCrane.group);
 
     /*************************************************************************
-     * 7. SEPARATE 3D OVERHEAD-TO-SABER CABLE TETHER SYSTEMS (RED & BLUE)
+     * 7. SEPARATE 3D OVERHEAD-TO-SABER CABLE TETHER SYSTEMS (ORANGE & BLUE)
      * High-visibility glowing braided steel suspension cables
      *************************************************************************/
     function createOverheadTetherSystem(colorHex) {
@@ -1709,8 +1844,8 @@
       };
     }
 
-    const redTether = createOverheadTetherSystem(0xff2a5f);
-    const blueTether = createOverheadTetherSystem(0x00e5ff);
+    const redTether = createOverheadTetherSystem(0xf97316);
+    const blueTether = createOverheadTetherSystem(0x3b82f6);
 
     // Update catenary cable curve between overhead crane carriage and handheld saber
     function updateTetherCurve(tether, startPos, endPos, tensionBoost = 0) {
@@ -1793,8 +1928,8 @@
       return { group: winchGroup, cableLine, drum, reticle, anchorEyelet };
     }
 
-    const redWinch = createCableWinch(0xff2a5f);  // Left Winch
-    const blueWinch = createCableWinch(0x00e5ff); // Right Winch
+    const redWinch = createCableWinch(0xf97316);  // Left Winch
+    const blueWinch = createCableWinch(0x3b82f6); // Right Winch
     scene.add(redWinch.group);
     scene.add(blueWinch.group);
 
@@ -1901,7 +2036,7 @@
         });
 
         // Busbar Linking Plate
-        const busbarMat = new THREE.MeshStandardMaterial({ color: 0x38bdf8, metalness: 0.95 });
+        const busbarMat = new THREE.MeshStandardMaterial({ color: 0x60a5fa, metalness: 0.95 });
         const busbar = new THREE.Mesh(new THREE.BoxGeometry(s * 0.62, s * 0.04, s * 0.16), busbarMat);
         busbar.position.set(0, s * 0.35, 0);
         g.add(busbar);
@@ -2021,7 +2156,7 @@
 
     function create3DIconCargo(type, w) {
       const rootGroup = new THREE.Group();
-      const colorHex = type === 'red' ? 0xff2a5f : type === 'blue' ? 0x00e5ff : 0x22c55e;
+      const colorHex = type === 'red' ? 0xf97316 : type === 'blue' ? 0x3b82f6 : 0x22c55e;
 
       // Select random distinct 3D object from catalog
       const catalog = ICON_CATALOG[type];
@@ -2208,7 +2343,7 @@
         startTime: performance.now()
       };
       playSound('crane_clamp');
-      createIndustrialSparks(targetCargo.position, cargoType === 'red' ? 0xff2a5f : 0x00e5ff);
+      createIndustrialSparks(targetCargo.position, cargoType === 'red' ? 0xf97316 : 0x3b82f6);
     }
 
     function updateCraneGantry(crane, dt) {
@@ -2230,7 +2365,7 @@
           crane.currentClawY = hd.targetY + 0.32;
           crane.state = 'hoisting';
           playSound('crane_hoist');
-          createIndustrialSparks(hd.cargo.position, hd.type === 'red' ? 0xff2a5f : 0x00e5ff);
+          createIndustrialSparks(hd.cargo.position, hd.type === 'red' ? 0xf97316 : 0x3b82f6);
         }
       } else if (crane.state === 'hoisting') {
         const hd = crane.hoistData;
@@ -2346,6 +2481,7 @@
     }
 
     function recordTrialOutcome(block, outcome, hitTimestamp = null, detailNote = '') {
+      if (block._ep) block._ep.outcome = outcome;
       state.trialCounter++;
       const nowHit = hitTimestamp || performance.now();
       const currentHitPos = block.mesh.position.clone();
@@ -2495,8 +2631,8 @@
             </div>
             <div class="grid grid-cols-2 gap-2 text-[11px] pt-1">
               <div><span class="text-slate-400">Hits/CR:</span> <strong class="text-emerald-400">${s.hits + s.cr}</strong></div>
-              <div><span class="text-slate-400">Miss/FA:</span> <strong class="text-rose-400">${s.misses + s.fa}</strong></div>
-              <div><span class="text-slate-400">Accuracy:</span> <strong class="text-cyan-300">${acc}%</strong></div>
+              <div><span class="text-slate-400">Miss/FA:</span> <strong class="text-orange-400">${s.misses + s.fa}</strong></div>
+              <div><span class="text-slate-400">Accuracy:</span> <strong class="text-blue-300">${acc}%</strong></div>
               <div><span class="text-slate-400">Avg RT:</span> <strong class="text-amber-200">${avgRT} ms</strong></div>
             </div>
           </div>
@@ -2510,7 +2646,7 @@
         const item = icons[key];
         const acc = item.total > 0 ? (((item.hits + item.cr) / item.total) * 100).toFixed(1) : '0.0';
         const avgRT = item.countRT > 0 ? (item.sumRT / item.countRT).toFixed(0) : '—';
-        const catColor = item.category.includes('Red') ? 'text-rose-400' : item.category.includes('Blue') ? 'text-sky-400' : 'text-emerald-400';
+        const catColor = item.category.includes('Orange') ? 'text-orange-400' : item.category.includes('Blue') ? 'text-blue-400' : 'text-emerald-400';
 
         return `
           <tr class="hover:bg-slate-900/90 transition">
@@ -2518,8 +2654,8 @@
             <td class="py-1.5 px-2.5 ${catColor} font-semibold">${item.category}</td>
             <td class="py-1.5 px-2.5 text-center">${item.total}</td>
             <td class="py-1.5 px-2.5 text-center text-emerald-400">${item.hits + item.cr}</td>
-            <td class="py-1.5 px-2.5 text-center text-rose-400">${item.misses + item.fa}</td>
-            <td class="py-1.5 px-2.5 text-center font-bold text-cyan-300">${acc}%</td>
+            <td class="py-1.5 px-2.5 text-center text-orange-400">${item.misses + item.fa}</td>
+            <td class="py-1.5 px-2.5 text-center font-bold text-blue-300">${acc}%</td>
             <td class="py-1.5 px-2.5 text-center text-amber-300">${avgRT}</td>
           </tr>
         `;
@@ -2592,17 +2728,17 @@
         return;
       }
       tbody.innerHTML = slice.map(row => {
-        const itemLabel = row.item || (row.type === 'RED' ? 'Tool' : row.type === 'BLUE' ? 'Power' : 'Hazard');
-        const blkBadge = row.type === 'RED'
-          ? `<span class="px-1 rounded bg-rose-500/25 text-rose-300 border border-rose-500/40">${itemLabel}</span>`
+        const itemLabel = row.item || (row.type === 'ORANGE' ? 'Tool' : row.type === 'BLUE' ? 'Power' : 'Hazard');
+        const blkBadge = row.type === 'ORANGE'
+          ? `<span class="px-1 rounded bg-orange-500/25 text-orange-300 border border-orange-500/40">${itemLabel}</span>`
           : row.type === 'BLUE'
-          ? `<span class="px-1 rounded bg-sky-500/25 text-sky-300 border border-sky-500/40">${itemLabel}</span>`
+          ? `<span class="px-1 rounded bg-blue-500/25 text-blue-300 border border-blue-500/40">${itemLabel}</span>`
           : `<span class="px-1 rounded bg-emerald-500/25 text-emerald-300 border border-emerald-500/40">${itemLabel}</span>`;
 
         let outClass = 'text-emerald-400 font-semibold';
         if (row.outcome === 'MISS') outClass = 'text-amber-400';
-        else if (row.outcome === 'CORRECT REJECTION') outClass = 'text-sky-400';
-        else if (row.outcome === 'FALSE ALARM') outClass = 'text-rose-400 font-bold';
+        else if (row.outcome === 'CORRECT REJECTION') outClass = 'text-blue-400';
+        else if (row.outcome === 'FALSE ALARM') outClass = 'text-orange-400 font-bold';
 
         const ratioStr = (parseFloat(row.d) / parseFloat(row.w)).toFixed(1);
 
@@ -2613,7 +2749,7 @@
             <td class="py-1 px-1 text-amber-300">${row.speed}</td>
             <td class="py-1 px-1">${ratioStr}</td>
             <td class="py-1 px-1 text-amber-200">${row.dt}</td>
-            <td class="py-1 px-1 text-sky-300">${row.calcA}</td>
+            <td class="py-1 px-1 text-blue-300">${row.calcA}</td>
             <td class="py-1 px-1 text-amber-400">${row.calcB}</td>
             <td class="py-1 px-1 ${outClass}">${row.outcome}</td>
           </tr>
@@ -2643,19 +2779,19 @@
         const progressZ = (blk.mesh.position.z - state.spawnZ) / (state.despawnZ - state.spawnZ);
         const py = progressZ * h;
 
-        radarCtx.fillStyle = blk.type === 'red' ? '#ff2a5f' : blk.type === 'blue' ? '#00e5ff' : '#10b981';
+        radarCtx.fillStyle = blk.type === 'red' ? '#f97316' : blk.type === 'blue' ? '#3b82f6' : '#10b981';
         radarCtx.fillRect(px - 3, py - 3, 6, 6);
       });
 
       // Draw Dual Crane Trolley Positions on Radar
       const rCraneX = ((redCrane.pos.x + 2.5) / 5.0) * w;
       const rCraneY = ((redCrane.pos.z - state.spawnZ) / (state.despawnZ - state.spawnZ)) * h;
-      radarCtx.strokeStyle = '#ff2a5f';
+      radarCtx.strokeStyle = '#f97316';
       radarCtx.strokeRect(rCraneX - 4, rCraneY - 4, 8, 8);
 
       const bCraneX = ((blueCrane.pos.x + 2.5) / 5.0) * w;
       const bCraneY = ((blueCrane.pos.z - state.spawnZ) / (state.despawnZ - state.spawnZ)) * h;
-      radarCtx.strokeStyle = '#00e5ff';
+      radarCtx.strokeStyle = '#3b82f6';
       radarCtx.strokeRect(bCraneX - 4, bCraneY - 4, 8, 8);
     }
 
@@ -2695,7 +2831,7 @@
       pairs.forEach((p, idx) => {
         const px = 12 + (p.id / maxID) * (w - 24);
         const py = h - 10 - (p.dt / maxDT) * (h - 22);
-        regCtx.fillStyle = idx === pairs.length - 1 ? '#38bdf8' : '#f59e0b';
+        regCtx.fillStyle = idx === pairs.length - 1 ? '#60a5fa' : '#f59e0b';
         regCtx.beginPath();
         regCtx.arc(px, THREE.MathUtils.clamp(py, 5, h - 5), 3, 0, Math.PI * 2);
         regCtx.fill();
@@ -2736,7 +2872,7 @@
       document.getElementById('lbl-prob-r').textContent = `${pr}%`;
       document.getElementById('lbl-prob-b').textContent = `${pb}%`;
       document.getElementById('lbl-prob-g').textContent = `${pg}%`;
-      document.getElementById('val-prob-summary').textContent = `${pr}% Red / ${pb}% Blue / ${pg}% Skip`;
+      document.getElementById('val-prob-summary').textContent = `${pr}% Orange / ${pb}% Blue / ${pg}% Skip`;
     }
 
     function updateFittsCalculator() {
@@ -2882,9 +3018,9 @@
         icon.className = 'fa-solid fa-pause';
         lbl.textContent = 'PAUSE CONVEYOR';
       } else {
-        btn.className = 'px-3 py-1.5 rounded font-scada text-xs font-bold tracking-wide bg-sky-500 hover:bg-sky-400 text-slate-950 shadow-lg shadow-sky-500/20 transition flex items-center gap-1.5';
+        btn.className = 'px-3 py-1.5 rounded font-scada text-xs font-bold tracking-wide bg-blue-500 hover:bg-blue-400 text-slate-950 shadow-lg shadow-blue-500/20 transition flex items-center gap-1.5';
         icon.className = 'fa-solid fa-play';
-        lbl.textContent = 'RESUME CONVEYOR';
+        lbl.textContent = 'Resume conveyor';
       }
     }
     document.getElementById('btn-toggle-stream').addEventListener('click', toggleStream);
@@ -2903,7 +3039,7 @@
             showFloatingFeedback(new THREE.Vector3(0, 1.8, 0), 'VR BAY OFFLINE', 'Running in Desktop 3D Mode', 'border-amber-500/50 text-amber-300');
             return;
           }
-          const session = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor', 'bounded-floor'] });
+          const session = await navigator.xr.requestSession('immersive-vr', { optionalFeatures: ['local-floor', 'bounded-floor', 'eye-tracking'] });
           renderer.xr.setSession(session);
           currentXRSession = session;
           document.getElementById('label-vr').textContent = 'EXIT VR';
@@ -2964,6 +3100,7 @@
         st.total = st.hits = st.misses = st.fa = st.cr = st.sumRT = st.countRT = 0;
       });
       aiReset();
+      botForget();
 
       updateSDTDashboard();
       updateFittsCalculatorUI();
@@ -2999,11 +3136,11 @@
       document.getElementById('training-banner').classList.remove('hidden');
       document.getElementById('training-banner').classList.add('flex');
       document.getElementById('label-training').textContent = 'EXIT TRAINING';
-      document.getElementById('btn-start-training').classList.replace('bg-indigo-600', 'bg-rose-600');
+      document.getElementById('btn-start-training').classList.replace('bg-slate-600', 'bg-orange-600');
 
       applyTrainingStageConfig();
       playSound('safe_chime');
-      showFloatingFeedback(new THREE.Vector3(0, 1.8, 0), 'TRAINING PROGRAM INITIATED', 'Stage 1: Left Winch Calibration', 'border-indigo-400 text-indigo-300');
+      showFloatingFeedback(new THREE.Vector3(0, 1.8, 0), 'TRAINING PROGRAM INITIATED', 'Stage 1: Left Winch Calibration', 'border-slate-400 text-slate-300');
     }
 
     function stopTrainingProgram(graduated = false) {
@@ -3012,7 +3149,7 @@
       document.getElementById('training-banner').classList.add('hidden');
       document.getElementById('training-banner').classList.remove('flex');
       document.getElementById('label-training').textContent = 'START TRAINING PROGRAM';
-      document.getElementById('btn-start-training').classList.replace('bg-rose-600', 'bg-indigo-600');
+      document.getElementById('btn-start-training').classList.replace('bg-orange-600', 'bg-slate-600');
 
       // Restore normal production probabilities
       state.probRed = 35;
@@ -3034,8 +3171,8 @@
       progressText.textContent = `${state.trainingCurrentCount} / ${state.trainingQuota} SUCCESSFUL`;
 
       if (state.trainingStage === 1) {
-        bannerTitle.textContent = 'STAGE 1: RED TOOLBOX WINCH CALIBRATION';
-        instruction.textContent = 'Intercept 5 Red Toolboxes using the Left Cable Winch (Left-Click / Q).';
+        bannerTitle.textContent = 'STAGE 1: ORANGE TOOLBOX WINCH CALIBRATION';
+        instruction.textContent = 'Intercept 5 Orange Toolboxes using the Left Cable Winch (Left-Click / Q).';
         state.probRed = 100;
         state.probBlue = 0;
         state.probGreen = 0;
@@ -3069,7 +3206,7 @@
         state.trainingCurrentCount = 0;
         document.getElementById('training-progress-bar').style.width = '0%';
         document.getElementById('training-progress-text').textContent = `0 / ${state.trainingQuota} SUCCESSFUL`;
-        showFloatingFeedback(new THREE.Vector3(0, 1.8, 0), 'CERTIFICATION RESET', 'False alarm: restart the 10-unit run', 'border-rose-500 text-rose-300');
+        showFloatingFeedback(new THREE.Vector3(0, 1.8, 0), 'CERTIFICATION RESET', 'False alarm: restart the 10-unit run', 'border-orange-500 text-orange-300');
         return;
       }
 
@@ -3103,7 +3240,7 @@
             playSound('safe_chime');
             state.trainingQuota = state.trainingStage === 4 ? 10 : 5;
             applyTrainingStageConfig();
-            showFloatingFeedback(new THREE.Vector3(0, 1.8, 0), `STAGE ${state.trainingStage - 1} COMPLETE!`, `Advancing to Stage ${state.trainingStage}`, 'border-indigo-400 text-indigo-300');
+            showFloatingFeedback(new THREE.Vector3(0, 1.8, 0), `STAGE ${state.trainingStage - 1} COMPLETE!`, `Advancing to Stage ${state.trainingStage}`, 'border-slate-400 text-slate-300');
           }
         }
       }
@@ -3117,8 +3254,8 @@
       if (state.bluePullTimer > 0) state.bluePullTimer = Math.max(0, state.bluePullTimer - dt);
 
       if (renderer.xr.isPresenting) {
-        // VR: each controller aims its own winch (left = red, right = blue)
-        updateVRAim();
+        // VR: gaze aims both winches when enabled, otherwise each controller aims its own
+        if (gaze.enabled) updateGazeAim(dt); else { updateVRAim(); gazeMarker.visible = false; }
         redWinch.group.position.set(state.redWinchPos.x, winchVisualY(state.redWinchPos.y), state.strikeZ);
         blueWinch.group.position.set(state.blueWinchPos.x, winchVisualY(state.blueWinchPos.y), state.strikeZ);
         redWinch.group.rotation.z = state.redPullTimer > 0 ? -0.45 : -0.15;
@@ -3186,7 +3323,7 @@
               // Snatched a HAZARD canister -> FALSE ALARM
               playSound('alarm_buzz');
               createIndustrialSparks(blkPos, 0xef4444);
-              showFloatingFeedback(blkPos, 'HAZARD BREACH! [FALSE ALARM]', 'Hazard barrel grabbed!', 'border-rose-500/60 text-rose-400');
+              showFloatingFeedback(blkPos, 'HAZARD BREACH! [FALSE ALARM]', 'Hazard barrel grabbed!', 'border-orange-500/60 text-orange-400');
               recordTrialOutcome(blk, 'FALSE ALARM', now, 'Seized Hazard');
               vrHaptic('left', 1, 160); vrHaptic('right', 1, 160);
               checkTrainingProgress('FALSE ALARM', 'green');
@@ -3194,19 +3331,19 @@
               activeBlocks.splice(i, 1);
             } else if (blk.type === 'red') {
               if (redSeized) {
-                // Successful Toolbox Hoist via Red Crane!
+                // Successful Toolbox Hoist via Orange Crane!
                 recordTrialOutcome(blk, 'HIT', now, 'Left Winch');
                 vrHaptic('left');
                 checkTrainingProgress('HIT', 'red');
                 dispatchCraneGrab(redCrane, blk.mesh, 'red');
-                showFloatingFeedback(blkPos, 'CRANE HOIST ENGAGED ✓', `Overhead Crane Drop! a:${state.calcA ? state.calcA.toFixed(0) : '—'}ms`, 'border-rose-500 text-rose-300');
+                showFloatingFeedback(blkPos, 'CRANE HOIST ENGAGED ✓', `Overhead Crane Drop! a:${state.calcA ? state.calcA.toFixed(0) : '—'}ms`, 'border-orange-500 text-orange-300');
                 activeBlocks.splice(i, 1);
               } else {
                 // Wrong cable pull
                 playSound('alarm_buzz');
                 createIndustrialSparks(blkPos, 0xf59e0b);
                 const outcome = wrongAsFA ? 'FALSE ALARM' : 'MISS';
-                showFloatingFeedback(blkPos, `WRONG WINCH (${outcome})`, 'Used Blue winch on Red toolbox', 'border-rose-500/50 text-amber-300');
+                showFloatingFeedback(blkPos, `WRONG WINCH (${outcome})`, 'Used Blue winch on Orange toolbox', 'border-orange-500/50 text-amber-300');
                 recordTrialOutcome(blk, outcome, now, 'Wrong Winch');
                 checkTrainingProgress('FALSE ALARM', 'red');
                 scene.remove(blk.mesh);
@@ -3219,13 +3356,13 @@
                 vrHaptic('right');
                 checkTrainingProgress('HIT', 'blue');
                 dispatchCraneGrab(blueCrane, blk.mesh, 'blue');
-                showFloatingFeedback(blkPos, 'CRANE HOIST ENGAGED ✓', `Overhead Crane Drop! a:${state.calcA ? state.calcA.toFixed(0) : '—'}ms`, 'border-sky-500 text-sky-300');
+                showFloatingFeedback(blkPos, 'CRANE HOIST ENGAGED ✓', `Overhead Crane Drop! a:${state.calcA ? state.calcA.toFixed(0) : '—'}ms`, 'border-blue-500 text-blue-300');
                 activeBlocks.splice(i, 1);
               } else {
                 playSound('alarm_buzz');
                 createIndustrialSparks(blkPos, 0xf59e0b);
                 const outcome = wrongAsFA ? 'FALSE ALARM' : 'MISS';
-                showFloatingFeedback(blkPos, `WRONG WINCH (${outcome})`, 'Used Red winch on Blue crate', 'border-rose-500/50 text-amber-300');
+                showFloatingFeedback(blkPos, `WRONG WINCH (${outcome})`, 'Used Orange winch on Blue crate', 'border-orange-500/50 text-amber-300');
                 recordTrialOutcome(blk, outcome, now, 'Wrong Winch');
                 checkTrainingProgress('FALSE ALARM', 'blue');
                 scene.remove(blk.mesh);
@@ -3258,8 +3395,8 @@
 
     /*************************************************************************
      * 11c. IN-HEADSET HUD (DOM overlays are invisible in VR, so the score board,
-     * A.X.E.L. terminal, stats matrix and hit feedback are drawn as 3D panels)
-     * Layout: score board top-left, A.X.E.L. top-right, both outside the cargo
+     * Coach terminal, stats matrix and hit feedback are drawn as 3D panels)
+     * Layout: score board top-left, Coach top-right, both outside the cargo
      * lanes (|x| > 2.2 m) and below the crane runway; stats panel in front of
      * the operator while paused.
      *************************************************************************/
@@ -3355,18 +3492,18 @@
     function drawVRScorePanel() {
       const p = vrScorePanel, c = p.ctx;
       const tag = state.trainingActive ? `TRAINING S${state.trainingStage}` : 'LIVE';
-      drawVRPanelFrame(p, '#38bdf8', 'OPERATOR LIVE', tag);
+      drawVRPanelFrame(p, '#60a5fa', 'OPERATOR LIVE', tag);
       c.font = 'bold 40px "Chakra Petch", sans-serif';
       c.fillStyle = '#34d399'; c.fillText(`HIT ${state.hits}`, 24, 118);
       c.fillStyle = '#fbbf24'; c.fillText(`MISS ${state.misses}`, 330, 118);
-      c.fillStyle = '#38bdf8'; c.fillText(`CR ${state.correctRejections}`, 24, 176);
-      c.fillStyle = '#fb7185'; c.fillText(`FA ${state.falseAlarms}`, 330, 176);
+      c.fillStyle = '#60a5fa'; c.fillText(`CR ${state.correctRejections}`, 24, 176);
+      c.fillStyle = '#fb923c'; c.fillText(`FA ${state.falseAlarms}`, 330, 176);
       c.fillStyle = '#e2e8f0';
       c.font = 'bold 30px "Chakra Petch", sans-serif';
       c.fillText(`d\u2032 ${(state.dPrime || 0).toFixed(2)}   ACC ${(state.accuracy || 0).toFixed(0)}%`, 24, 226);
       c.font = '24px "JetBrains Mono", monospace';
       if (state.trainingActive) {
-        c.fillStyle = '#a5b4fc';
+        c.fillStyle = '#cbd5e1';
         c.fillText(`Stage ${state.trainingStage}: ${state.trainingCurrentCount} / ${state.trainingQuota}`, 24, 276);
       } else {
         c.fillStyle = '#94a3b8';
@@ -3378,12 +3515,12 @@
     function drawVRAiPanel() {
       const p = vrAiPanel, c = p.ctx;
       const drillTag = aiSup.drill ? `DRILL ${aiSup.drill.resolved}/${aiSup.drill.count}` : 'ONLINE';
-      drawVRPanelFrame(p, '#c084fc', 'A.X.E.L. SUPERVISOR', drillTag);
+      drawVRPanelFrame(p, '#94a3b8', 'COACH', drillTag);
       c.textAlign = 'left';
       let y = 100;
       if (vrAiMessage.title) {
         c.font = 'bold 30px "Chakra Petch", sans-serif';
-        c.fillStyle = vrAiMessage.type === 'tutorial' ? '#fde047' : '#e9d5ff';
+        c.fillStyle = vrAiMessage.type === 'tutorial' ? '#fde047' : '#e2e8f0';
         c.fillText(vrAiMessage.title, 24, y, 590);
         y += 42;
       }
@@ -3401,12 +3538,12 @@
 
     function drawVRStatsPanel() {
       const p = vrStatsPanel, c = p.ctx;
-      drawVRPanelFrame(p, '#22d3ee', 'OPERATOR STATS \u2014 PAUSED', 'A / X / stick click = resume');
+      drawVRPanelFrame(p, '#60a5fa', 'OPERATOR STATS \u2014 PAUSED', 'A / X / stick click = resume');
       c.font = 'bold 30px "Chakra Petch", sans-serif';
       c.fillStyle = '#34d399'; c.fillText(`HIT ${state.hits}`, 24, 108);
       c.fillStyle = '#fbbf24'; c.fillText(`MISS ${state.misses}`, 190, 108);
-      c.fillStyle = '#38bdf8'; c.fillText(`CR ${state.correctRejections}`, 380, 108);
-      c.fillStyle = '#fb7185'; c.fillText(`FA ${state.falseAlarms}`, 530, 108);
+      c.fillStyle = '#60a5fa'; c.fillText(`CR ${state.correctRejections}`, 380, 108);
+      c.fillStyle = '#fb923c'; c.fillText(`FA ${state.falseAlarms}`, 530, 108);
       c.fillStyle = '#e2e8f0'; c.fillText(`d\u2032 ${(state.dPrime || 0).toFixed(2)}`, 690, 108);
       c.fillText(`ACC ${(state.accuracy || 0).toFixed(0)}%`, 850, 108);
 
@@ -3429,8 +3566,8 @@
         c.fillStyle = '#e2e8f0';
         c.fillText(String(s.total), cols[1], y);
         c.fillStyle = '#34d399'; c.fillText(String(s.hits + s.cr), cols[2], y);
-        c.fillStyle = '#fb7185'; c.fillText(String(s.misses + s.fa), cols[3], y);
-        c.fillStyle = '#67e8f9'; c.fillText(yieldPct, cols[4], y);
+        c.fillStyle = '#fb923c'; c.fillText(String(s.misses + s.fa), cols[3], y);
+        c.fillStyle = '#93c5fd'; c.fillText(yieldPct, cols[4], y);
         c.fillStyle = '#fcd34d'; c.fillText(avg, cols[5], y);
       }
 
@@ -3441,7 +3578,7 @@
       drawHead(y, 'BY 3D EQUIPMENT');
       Object.entries(state.interactionStats.byIcon).forEach(([name, s]) => {
         y += 34;
-        const col = s.category.includes('Red') ? '#fb7185' : s.category.includes('Blue') ? '#38bdf8' : '#34d399';
+        const col = s.category.includes('Orange') ? '#fb923c' : s.category.includes('Blue') ? '#60a5fa' : '#34d399';
         drawRow(y, name, s, col);
       });
       c.font = '20px "JetBrains Mono", monospace';
@@ -3465,9 +3602,9 @@
     function vrFeedbackColor(styleClass) {
       const s = styleClass || '';
       if (s.includes('emerald')) return '#34d399';
-      if (s.includes('sky') || s.includes('cyan')) return '#38bdf8';
-      if (s.includes('rose') && !s.includes('amber')) return '#fb7185';
-      if (s.includes('indigo')) return '#a5b4fc';
+      if (s.includes('blue')) return '#60a5fa';
+      if (s.includes('orange') && !s.includes('amber')) return '#fb923c';
+      if (s.includes('slate')) return '#cbd5e1';
       return '#fbbf24';
     }
     // Shrink the font until the text fits, instead of squashing it horizontally with maxWidth.
@@ -3538,7 +3675,7 @@
     }
 
     /*************************************************************************
-     * 13. A.X.E.L. AI FLOOR SUPERVISOR (always on; no toggle button)
+     * 13. Coach AI FLOOR SUPERVISOR (always on; no toggle button)
      * Watches every outcome, spots repeated mistakes, gives a short tutorial and
      * can start a practice drill. Works offline. Optionally set AI_CONFIG.apiKey
      * to let free-form questions go to the Gemini API (the key would be visible
@@ -3546,7 +3683,7 @@
      *************************************************************************/
     const AI_CONFIG = { apiKey: '', model: 'gemini-3-flash-preview' };
     const aiSup = state.aiSupervisor;
-    let vrAiMessage = { type: 'status', title: 'A.X.E.L. ONLINE', text: 'Watching your sorting. I step in when you repeat a mistake.' };
+    let vrAiMessage = { type: 'status', title: 'COACH READY', text: 'Watching your sorting. I step in when you repeat a mistake.' };
 
     function aiAppendDom(text, type) {
       const box = document.getElementById('ai-transcript');
@@ -3554,7 +3691,7 @@
       const styles = {
         info: 'border-slate-600 text-slate-300',
         tutorial: 'border-amber-400/70 text-amber-200 bg-amber-950/30',
-        user: 'border-sky-500/60 text-sky-200 ml-3',
+        user: 'border-blue-500/60 text-blue-200 ml-3',
         ok: 'border-emerald-500/60 text-emerald-300'
       };
       const el = document.createElement('div');
@@ -3594,7 +3731,7 @@
       const s = q.toLowerCase();
       if (/(how am i|progress|score|stat|accuracy|doing|performance)/.test(s)) return aiStatSummary() + ' Open Stats for the speed and equipment breakdown.';
       if (/(hazard|green|skip|biohazard|radiation|gas)/.test(s)) return 'Green cargo (biohazard drum, radiation isotope, gas cylinder) is never grabbed. Keep both winches off it and let it reach the end of the belt: that scores a correct rejection.';
-      if (/(red|wrench|hammer|gear|cog|toolbox|tool)/.test(s)) return 'Red cargo (pipe wrench, gear, sledgehammer) goes to the LEFT winch. Move it into the crate\u2019s lane early, then let the crate arrive inside the depth zone (Z \u22121.8 to +0.8 m).';
+      if (/(red|orange|wrench|hammer|gear|cog|toolbox|tool)/.test(s)) return 'Orange cargo (pipe wrench, gear, sledgehammer) goes to the LEFT winch. Move it into the crate\u2019s lane early, then let the crate arrive inside the depth zone (Z \u22121.8 to +0.8 m).';
       if (/(blue|battery|microchip|dynamo|power)/.test(s)) return 'Blue cargo (battery, microchip, dynamo rotor) goes to the RIGHT winch. Pre-position it before the crate enters the hit volume instead of chasing it.';
       if (/(vr|quest|controller|headset|pause|trigger|button)/.test(s)) return 'In VR the left controller drives the red winch and the right one the blue winch: point at the lane and touch the matching crate. Trigger fires the cable. A, X or a stick click pauses and opens the stats panel; press again to resume.';
       if (/(depth|zone|3d|z axis|hit volume)/.test(s)) return 'The hit volume is 3D: it runs from Z \u22121.8 m to +0.8 m. A crate can be caught anywhere inside it, so you do not need to wait for the last moment.';
@@ -3606,7 +3743,7 @@
 
     async function aiAskGemini(question) {
       const body = {
-        systemInstruction: { parts: [{ text: 'You are A.X.E.L., a concise training coach for a VR cargo-sorting task. Red cargo goes to the left winch, blue cargo to the right winch, green hazard cargo is never grabbed. Answer in at most three short sentences. Live stats: ' + aiStatSummary() }] },
+        systemInstruction: { parts: [{ text: 'You are the coach, a concise training coach for a VR cargo-sorting task. Orange cargo goes to the left winch, blue cargo to the right winch, green hazard cargo is never grabbed. Answer in at most three short sentences. Live stats: ' + aiStatSummary() }] },
         contents: [{ role: 'user', parts: [{ text: question }] }]
       };
       let delay = 600;
@@ -3691,12 +3828,12 @@
       },
       wrongWinch: {
         title: 'MATCH HAND TO COLOUR',
-        short: 'RED cargo = LEFT winch. BLUE cargo = RIGHT winch. Check the colour before you reach.',
-        full: 'Two recent errors came from the wrong winch touching the crate. Red cargo goes to the LEFT winch and blue cargo to the RIGHT winch. Read the colour first, then reach with that side only.',
+        short: 'ORANGE cargo = LEFT winch. BLUE cargo = RIGHT winch. Check the colour before you reach.',
+        full: 'Two recent errors came from the wrong winch touching the crate. Orange cargo goes to the LEFT winch and blue cargo to the RIGHT winch. Read the colour first, then reach with that side only.',
         drill: null
       },
       red: {
-        title: 'RED CARGO TIPS',
+        title: 'ORANGE CARGO TIPS',
         short: 'Bring the LEFT winch to the crate\u2019s lane early and let it arrive inside the depth zone.',
         full: 'Three red crates in a row got past you. Do not chase them: move the LEFT winch into the crate\u2019s lane while it is still far away and let it come to you. The hit volume is deep (Z \u22121.8 to +0.8 m), so you have more than one moment to catch it. Practice drill: the next 5 units are red.',
         drill: 'red'
@@ -3795,15 +3932,275 @@
       aiSup.drill = null;
       aiSup.lastInterventionTime = -1e9;
       aiUpdateDrillUi();
-      vrAiMessage = { type: 'status', title: 'A.X.E.L. ONLINE', text: 'Counters reset. Watching your sorting.' };
+      vrAiMessage = { type: 'status', title: 'COACH READY', text: 'Counters reset. Watching your sorting.' };
       vrPanelsDirty = true;
     }
 
     (function aiBoot() {
       const badge = document.getElementById('ai-mode-badge');
-      if (badge && AI_CONFIG.apiKey) badge.textContent = 'GEMINI + LOCAL';
-      aiAppendDom('A.X.E.L. online. I watch your sorting and step in if you repeat the same mistake. Ask me anything below.', 'info');
+      if (badge && AI_CONFIG.apiKey) badge.textContent = 'Gemini + local';
+      aiAppendDom('Coach ready. I watch your sorting and step in if you repeat the same mistake. Ask me anything below.', 'info');
     })();
+
+    /*************************************************************************
+     * 13b. MOVEMENT TRAINER (learns from you, then shows a ghost demo)
+     * Training period: records (a) every approach you make toward a crate,
+     * frame by frame (when you start moving, how direct the path is, where
+     * you end up) and (b) how you move while nothing is coming (where you
+     * park, how much you drift, how often you fidget). When the period is
+     * over, a ghost pair of winches can be switched on. It never touches the
+     * real winches or the score: it only shows a clean version of your own
+     * best movement so you can copy it.
+     *************************************************************************/
+    const BOT_TAU0 = -1.6, BOT_TAU_STEP = 0.1, BOT_TAU_N = 17;
+    const BOT_MIN_EPISODES = 12, BOT_MIN_IDLE_SECS = 30;
+    const bot = {
+      threshold: 40, base: 0, phase: 'training', demo: false,
+      episodes: [], idle: { red: [], blue: [] }, idleSecs: 0,
+      prevPos: { red: null, blue: null },
+      model: null, modelKey: '', ghostObjs: null,
+      follow: { close: 0, total: 0 }, uiClock: 0
+    };
+    const botMean = a => a.length ? a.reduce((s, v) => s + v, 0) / a.length : 0;
+    const botSd = a => { if (a.length < 2) return 0; const m = botMean(a); return Math.sqrt(a.reduce((s, v) => s + (v - m) * (v - m), 0) / (a.length - 1)); };
+    const botMedian = a => { if (!a.length) return 0; const s = a.slice().sort((x, y) => x - y); return s[Math.floor(s.length / 2)]; };
+    const botClamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+    function botPush(arr, val, cap) { arr.push(val); if (arr.length > cap) arr.shift(); }
+
+    // ---- Learning --------------------------------------------------------
+    function botObserve(dt) {
+      if (bot.phase !== 'training' || !state.streamActive || dt <= 0) return;
+      const far = state.hitZoneFarZ;
+      const busy = { red: false, blue: false };
+      for (const b of activeBlocks) {
+        if (b.resolved || (b.type !== 'red' && b.type !== 'blue')) continue;
+        const z = b.mesh.position.z;
+        if (z < state.hitZoneNearZ) busy[b.type] = true;
+        if (b._ep && b._ep.done) { b._pz = z; continue; }
+        const w = b.type === 'red' ? state.redWinchPos : state.blueWinchPos;
+        if (z < far) {
+          if (!b._ep) b._ep = { type: b.type, speed: b.speed, pts: [], outcome: null, done: false };
+          if (b._ep.pts.length < 120) b._ep.pts.push({ t: -(far - z) / b.speed, x: w.x, y: w.y });
+        } else if (b._ep && !b._ep.done) {
+          b._ep.dx = w.x - b.x; b._ep.dy = w.y - b.y; b._ep.done = true;
+          botPush(bot.episodes, b._ep, 150);
+        }
+        b._pz = z;
+      }
+      ['red', 'blue'].forEach(t => {
+        const w = t === 'red' ? state.redWinchPos : state.blueWinchPos;
+        const p = bot.prevPos[t];
+        if (p && !busy[t]) {
+          const v = Math.hypot(w.x - p.x, w.y - p.y) / dt;
+          botPush(bot.idle[t], { x: w.x, y: w.y, v: Math.min(v, 30) }, 600);
+          bot.idleSecs += dt;
+        }
+        bot.prevPos[t] = bot.prevPos[t] || { x: 0, y: 0 };
+        bot.prevPos[t].x = w.x; bot.prevPos[t].y = w.y;
+      });
+      if (botHitsDone() >= bot.threshold && bot.episodes.length >= BOT_MIN_EPISODES && bot.idleSecs >= BOT_MIN_IDLE_SECS) {
+        bot.phase = 'ready';
+        showFloatingFeedback(new THREE.Vector3(0, 1.8, 0), 'Training period complete', 'Movement demo is ready (press B)', 'border-amber-500/50 text-amber-300');
+        botUpdateUI(true);
+      }
+    }
+    const botHitsDone = () => Math.max(0, state.hits - bot.base);
+
+    // ---- Model -------------------------------------------------------------
+    function botInterp(pts, t) {
+      if (t <= pts[0].t) return pts[0];
+      const last = pts[pts.length - 1];
+      if (t >= last.t) return last;
+      for (let i = 1; i < pts.length; i++) {
+        if (pts[i].t >= t) {
+          const a = pts[i - 1], c = pts[i], k = (t - a.t) / Math.max(c.t - a.t, 1e-6);
+          return { x: a.x + (c.x - a.x) * k, y: a.y + (c.y - a.y) * k };
+        }
+      }
+      return last;
+    }
+    function botIdleModel(type) {
+      const a = bot.idle[type];
+      const fallback = { x: type === 'red' ? -0.45 : 0.45, y: WINCH_MIN_Y, spread: 0, moveFrac: 0, speed: 0, known: false };
+      if (a.length < 20) return fallback;
+      const moving = a.filter(s => s.v > 0.1).map(s => s.v);
+      return {
+        x: botMean(a.map(s => s.x)), y: botClamp(botMean(a.map(s => s.y)), WINCH_MIN_Y, WINCH_MAX_Y),
+        spread: Math.hypot(botSd(a.map(s => s.x)), botSd(a.map(s => s.y))),
+        moveFrac: moving.length / a.length, speed: botMedian(moving), known: true
+      };
+    }
+    function botGetModel() {
+      const key = bot.episodes.length + ':' + bot.idle.red.length + ':' + bot.idle.blue.length;
+      if (key === bot.modelKey) return bot.model;
+      bot.modelKey = key;
+      const eps = bot.episodes.filter(e => e.pts.length >= 4);
+      if (eps.length < 5) return (bot.model = null);
+      let pool = eps.filter(e => e.outcome === 'HIT');
+      if (pool.length < 5) pool = eps;
+      const scored = pool.map(e => {
+        const a = e.pts[0], z = e.pts[e.pts.length - 1];
+        let path = 0;
+        for (let i = 1; i < e.pts.length; i++) path += Math.hypot(e.pts[i].x - e.pts[i - 1].x, e.pts[i].y - e.pts[i - 1].y);
+        const disp = Math.hypot(z.x - a.x, z.y - a.y);
+        return { e, disp, eff: path > 1e-6 ? disp / path : 1 };
+      }).sort((p, q) => q.eff - p.eff);
+      const sel = scored.slice(0, Math.max(5, Math.ceil(scored.length * 0.6)));   // your cleanest 60%
+      const sums = new Array(BOT_TAU_N).fill(0);
+      let n = 0;
+      sel.forEach(p => {
+        if (p.disp < 0.15) return;
+        n++;
+        const a = p.e.pts[0], z = p.e.pts[p.e.pts.length - 1], d2 = p.disp * p.disp;
+        for (let k = 0; k < BOT_TAU_N; k++) {
+          const q = botInterp(p.e.pts, BOT_TAU0 + k * BOT_TAU_STEP);
+          sums[k] += botClamp(((q.x - a.x) * (z.x - a.x) + (q.y - a.y) * (z.y - a.y)) / d2, 0, 1);
+        }
+      });
+      let curve = sums.map(v => v / Math.max(n, 1));
+      if (n < 3) curve = curve.map((_, k) => { const u = botClamp((BOT_TAU0 + k * BOT_TAU_STEP + 0.8) / 0.7, 0, 1); return u * u * (3 - 2 * u); });
+      for (let k = 1; k < BOT_TAU_N; k++) curve[k] = Math.max(curve[k], curve[k - 1]);
+      curve[BOT_TAU_N - 1] = 1;
+      const timeAt = lvl => { for (let k = 0; k < BOT_TAU_N; k++) if (curve[k] >= lvl) return -(BOT_TAU0 + k * BOT_TAU_STEP); return 0; };
+      return (bot.model = {
+        curve, n: sel.length, moved: n,
+        off: { dx: botMean(sel.map(p => p.e.dx)), dy: botMean(sel.map(p => p.e.dy)) },
+        eff: botMean(sel.map(p => p.eff)), onset: timeAt(0.1), settle: timeAt(0.9),
+        idle: { red: botIdleModel('red'), blue: botIdleModel('blue') }
+      });
+    }
+    function botCurveAt(m, t) {
+      if (t <= BOT_TAU0) return m.curve[0];
+      if (t >= 0) return 1;
+      const f = (t - BOT_TAU0) / BOT_TAU_STEP, i = Math.floor(f);
+      return m.curve[i] + (m.curve[Math.min(i + 1, BOT_TAU_N - 1)] - m.curve[i]) * (f - i);
+    }
+
+    // ---- Ghost demo ----------------------------------------------------------
+    function botEnsureGhost(m) {
+      if (bot.ghostObjs) return;
+      // Each ghost uses a lighter tint of its own winch colour, so the pair stays distinguishable
+      const tint = { red: 0xfdba74, blue: 0x93c5fd };
+      bot.ghostObjs = {};
+      ['red', 'blue'].forEach(t => {
+        const mat = new THREE.MeshBasicMaterial({ color: tint[t], transparent: true, opacity: 0.4, depthWrite: false });
+        const w = createCableWinch(tint[t]);
+        w.group.traverse(o => { if (o.isMesh) o.material = mat; if (o.isLine) o.visible = false; });
+        scene.add(w.group);
+        const ring = new THREE.Mesh(new THREE.RingGeometry(0.14, 0.17, 40),
+          new THREE.MeshBasicMaterial({ color: tint[t], transparent: true, opacity: 0.9, depthTest: false }));
+        ring.renderOrder = 998; scene.add(ring);
+        const r = m.idle[t];
+        bot.ghostObjs[t] = { group: w.group, ring, x: r.x, y: r.y, from: { x: r.x, y: r.y }, tx: r.x, ty: r.y, block: null };
+      });
+    }
+    function botGhostUpdate(dt) {
+      const show = bot.demo && bot.phase === 'ready';
+      if (bot.ghostObjs) Object.values(bot.ghostObjs).forEach(g => { g.group.visible = show; if (!show) g.ring.visible = false; });
+      if (!show) return;
+      const m = botGetModel(); if (!m) return;
+      botEnsureGhost(m);
+      const far = state.hitZoneFarZ, ease = 1 - Math.exp(-dt * 16);
+      ['red', 'blue'].forEach(type => {
+        const g = bot.ghostObjs[type], user = type === 'red' ? state.redWinchPos : state.blueWinchPos;
+        let approach = null, hold = null;
+        for (const b of activeBlocks) {
+          if (b.resolved || b.type !== type) continue;
+          const z = b.mesh.position.z;
+          if (z >= state.hitZoneNearZ) continue;
+          if (z >= far) hold = b; else if (!approach || z > approach.mesh.position.z) approach = b;
+        }
+        const blk = hold || approach;
+        let wantX, wantY, pulling = false;
+        if (blk) {
+          if (g.block !== blk) {
+            g.block = blk; g.from = { x: g.x, y: g.y };
+            g.tx = botClamp(blk.x + m.off.dx, -2.5, 2.5);
+            g.ty = botClamp(blk.y + m.off.dy, WINCH_MIN_Y, WINCH_MAX_Y);
+          }
+          const tau = (far - blk.mesh.position.z) / blk.speed;     // seconds until the hit zone
+          const s = botCurveAt(m, -tau);
+          wantX = g.from.x + (g.tx - g.from.x) * s; wantY = g.from.y + (g.ty - g.from.y) * s;
+          pulling = blk === hold;
+          g.ring.visible = true; g.ring.position.set(g.tx, g.ty, state.strikeZ + 0.03);
+          if (tau < 0.6 && tau > -0.3 && user) {
+            bot.follow.total++;
+            if (Math.hypot(user.x - g.x, user.y - g.y) < 0.25) bot.follow.close++;
+          }
+        } else {
+          g.block = null; g.ring.visible = false;
+          const r = m.idle[type];
+          wantX = r.x; wantY = r.y;
+        }
+        g.x += (wantX - g.x) * ease; g.y += (wantY - g.y) * ease;
+        g.group.position.set(g.x, winchVisualY(g.y), state.strikeZ);
+        const side = type === 'red' ? -1 : 1;
+        g.group.rotation.z = side * (pulling ? 0.45 : 0.15);
+      });
+    }
+
+    // ---- Controls & UI ---------------------------------------------------------
+    function toggleBot() {
+      if (bot.phase !== 'ready') { botSetNote('Training is not finished yet. Keep playing.'); return; }
+      bot.demo = !bot.demo;
+      bot.follow.close = bot.follow.total = 0;
+      botSetNote('');
+      botUpdateUI(true);
+    }
+    function botForget() {
+      bot.phase = 'training'; bot.demo = false; bot.base = state.hits;
+      bot.episodes = []; bot.idle = { red: [], blue: [] }; bot.idleSecs = 0;
+      bot.prevPos = { red: null, blue: null }; bot.modelKey = ''; bot.model = null;
+      bot.follow.close = bot.follow.total = 0;
+      activeBlocks.forEach(b => { delete b._ep; });
+      if (bot.ghostObjs) Object.values(bot.ghostObjs).forEach(g => { g.group.visible = false; g.ring.visible = false; });
+      botSetNote('');
+      botUpdateUI(true);
+    }
+    function botSetThreshold(v) {
+      bot.threshold = botClamp(parseInt(v, 10) || 40, 10, 200);
+      if (bot.phase === 'ready' && botHitsDone() < bot.threshold) bot.phase = 'training';
+      botUpdateUI(true);
+    }
+    function botSetNote(msg) { const el = document.getElementById('bot-note'); if (el) el.textContent = msg; }
+    window.addEventListener('keydown', e => {
+      if (e.target && e.target.matches && e.target.matches('input, textarea')) return;
+      if (e.key === 'b' || e.key === 'B') toggleBot();
+    });
+    function botUpdateUI(force) {
+      const now = performance.now();
+      if (!force && now - bot.uiClock < 250) return;
+      bot.uiClock = now;
+      const $ = id => document.getElementById(id);
+      if (!$('bot-status')) return;
+      const rHits = Math.min(1, botHitsDone() / bot.threshold);
+      const rEps = Math.min(1, bot.episodes.length / BOT_MIN_EPISODES);
+      const rIdle = Math.min(1, bot.idleSecs / BOT_MIN_IDLE_SECS);
+      const done = bot.phase === 'ready';
+      $('bot-status').textContent = bot.demo && done ? 'Demo on' : (done ? 'Ready' : 'Training');
+      $('bot-progress-bar').style.width = (done ? 100 : (rHits + rEps + rIdle) / 3 * 100) + '%';
+      $('bot-req').innerHTML = done ? 'Training period complete.' :
+        `<div class="flex justify-between"><span>Hits</span><span>${Math.min(botHitsDone(), bot.threshold)} / ${bot.threshold}</span></div>` +
+        `<div class="flex justify-between"><span>Crate approaches recorded</span><span>${Math.min(bot.episodes.length, BOT_MIN_EPISODES)} / ${BOT_MIN_EPISODES}</span></div>` +
+        `<div class="flex justify-between"><span>Movement between crates</span><span>${Math.min(bot.idleSecs, BOT_MIN_IDLE_SECS).toFixed(0)} / ${BOT_MIN_IDLE_SECS} s</span></div>`;
+      $('bot-btn-label').textContent = bot.demo ? 'Hide demo' : 'Show demo';
+      $('bot-threshold').value = bot.threshold;
+      const m = botGetModel();
+      if (m) {
+        const r = m.idle.red, b = m.idle.blue, row = (k, v) => `<div class="flex justify-between"><span>${k}</span><span>${v}</span></div>`;
+        $('bot-profile').innerHTML =
+          row('Starts moving', m.onset ? m.onset.toFixed(2) + ' s before arrival' : 'late') +
+          row('In position', m.settle ? m.settle.toFixed(2) + ' s before arrival' : 'at arrival') +
+          row('Path efficiency', (m.eff * 100).toFixed(0) + '%') +
+          row('Aim on hits (x / y)', `${(m.off.dx * 100).toFixed(0)} / ${(m.off.dy * 100).toFixed(0)} cm`) +
+          (r.known ? row('Idle spot (red / blue)', `${r.x.toFixed(2)} / ${b.x.toFixed(2)} m`) : '') +
+          (r.known ? row('Idle drift', `±${(((r.spread + b.spread) / 2) * 100).toFixed(0)} cm, moving ${(((r.moveFrac + b.moveFrac) / 2) * 100).toFixed(0)}%`) : '');
+      } else {
+        $('bot-profile').textContent = 'Still collecting your movement.';
+      }
+      $('bot-follow').textContent = bot.demo && bot.follow.total > 20
+        ? `You matched the demo ${(bot.follow.close / bot.follow.total * 100).toFixed(0)}% of the time (within 25 cm).` : '';
+    }
 
     /*************************************************************************
      * 12. MAIN ANIMATION LOOP
@@ -3812,7 +4209,8 @@
     let lastSpawnTime = performance.now();
     let nextAutoInterval = state.spawnInterval;
 
-    function animate() {
+    function animate(_t, xrFrame) {
+      gaze.frame = xrFrame || null;
       const now = performance.now();
       const dt = Math.min((now - lastFrameTime) / 1000, 0.1);
       lastFrameTime = now;
@@ -3857,6 +4255,10 @@
       updateCraneGantry(redCrane, dt);
       updateCraneGantry(blueCrane, dt);
 
+      botObserve(dt);
+      botGhostUpdate(dt);
+      botUpdateUI(false);
+
       // Check Interception & Hits across 3D Depth
       if (state.streamActive) {
         checkCableCargoCollisions(now);
@@ -3880,6 +4282,7 @@
 
       updateVRPanels(now);
       updateVRFeedbacks(now);
+      if (gaze.enabled && renderer.xr.isPresenting) refreshGazeLabel();
 
       renderer.render(scene, camera);
     }
